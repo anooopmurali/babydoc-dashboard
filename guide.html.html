@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BabyDoc — Dashboard Guidebook</title>
+<style>
+  :root{
+    --navy:#16294D; --navy2:#21416F; --ink:#1B2536; --muted:#5E6A7B; --muted2:#94A0B2;
+    --line:#E6EAF1; --bg:#F4F6FA; --card:#fff; --good:#2E7D6B; --good-soft:#E6F2EF;
+    --gold:#B26B00; --danger:#B23A2E; --danger-soft:#FBE9E7; --soft:#EAF0F8;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45}
+  .num{font-variant-numeric:tabular-nums}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 18px 80px}
+
+  /* top bar */
+  .topbar{background:var(--navy);color:#fff;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;flex-direction:column}
+  .brand b{font-size:17px;font-style:italic;letter-spacing:.2px}
+  .brand span{font-size:11px;color:#9DB3D4}
+  .asat{text-align:right;font-size:11px;color:#9DB3D4}
+  .asat b{display:block;color:#fff;font-size:12px;margin-top:2px}
+  .tabs{display:flex;gap:18px;padding:10px 22px 0;background:var(--navy)}
+  .tabs a{font-size:12.5px;color:#9DB3D4;text-decoration:none;padding-bottom:9px;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px}
+  .tabs a.on{color:#fff;font-weight:700;border-color:#fff}
+  .tabs .soon{font-size:8.5px;background:#2B4068;color:#AFC0DC;padding:2px 6px;border-radius:20px}
+
+  .ribbon{background:#FFF6E6;border-bottom:1px solid #F0DFB8;color:#7A5B14;font-size:12.5px;padding:8px 22px;text-align:center}
+  .ribbon b{color:#5E4406}
+
+  /* reminders */
+  .nstack{margin:18px 0 0;cursor:pointer;user-select:none}
+  .nstack-head{position:relative;background:var(--danger-soft);border:1px solid #F0C9C4;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;color:#8C2C22;font-weight:700;font-size:14px}
+  .nstack-head .dot{width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+  .nstack-head .chev{margin-left:auto;transition:transform .2s}
+  .nstack.open .nstack-head .chev{transform:rotate(180deg)}
+  .nstack::before,.nstack::after{content:"";display:block;height:0;margin:0 6px;border-radius:12px}
+  .nstack:not(.open)::before{content:"";display:block;height:6px;margin:0 6px;background:#FCEFEC;border:1px solid #F4D7D2;border-top:0;border-radius:0 0 12px 12px}
+  .nlist{display:none;margin-top:8px;border:1px solid #F0C9C4;border-radius:12px;overflow:hidden}
+  .nstack.open .nlist{display:block;animation:fade .25s ease}
+  .nrow{padding:11px 16px;display:flex;gap:10px;align-items:flex-start;border-top:1px solid #F6DDD8;background:#fff}
+  .nrow:first-child{border-top:0}
+  .nrow .who{font-weight:700;color:#8C2C22;font-size:13px;white-space:nowrap}
+  .nrow .msg{color:#7A4B45;font-size:13px}
+  @keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+  /* kpis */
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 14px}
+  .kpi .lab{font-size:12.5px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .kpi .dot{width:7px;height:7px;border-radius:50%}
+  .kpi .val{font-size:30px;font-weight:680;letter-spacing:-.02em;margin:10px 0 2px;line-height:1.05}
+  .kpi .sub{font-size:12px;color:var(--muted2)}
+  .kpi.net{background:var(--navy);border-color:var(--navy)}
+  .kpi.net .lab,.kpi.net .sub{color:#AFC0DC}
+  .kpi.net .val{color:#fff}
+
+  /* toolbar */
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:20px}
+  .search{flex:1;min-width:200px;position:relative}
+  .search input{width:100%;padding:10px 12px 10px 34px;border:1px solid var(--line);border-radius:11px;font-size:14px;background:#fff;font-family:var(--font)}
+  .search svg{position:absolute;left:11px;top:11px}
+  .seg{display:inline-flex;background:#EDEFF3;border-radius:11px;padding:3px}
+  .seg button{border:0;background:transparent;padding:7px 12px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--font)}
+  .seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(20,30,50,.12)}
+
+  /* table */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-top:16px;overflow:hidden}
+  .panel-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+  .panel-h h3{margin:0;font-size:15px}
+  .panel-h .meta{font-size:12px;color:var(--muted2)}
+  table{width:100%;border-collapse:collapse}
+  thead th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;text-align:right;padding:11px 14px;cursor:pointer;white-space:nowrap;border-bottom:1px solid var(--line);background:#fff}
+  thead th:first-child{text-align:left}
+  thead th .arr{color:var(--navy);font-size:10px}
+  tbody td{padding:12px 14px;border-bottom:1px solid #F1F4F8;text-align:right;font-size:13.5px}
+  tbody td:first-child{text-align:left}
+  tbody tr.sup{cursor:pointer}
+  tbody tr.sup:hover{background:#FAFBFD}
+  .supname{display:flex;align-items:center;gap:8px;font-weight:600}
+  .ch{color:var(--muted2);transition:transform .18s;display:inline-block;font-size:11px}
+  tr.sup.open .ch{transform:rotate(90deg)}
+  .flag{width:16px;height:16px;border-radius:50%;background:var(--danger);color:#fff;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+  .noteico{width:16px;height:16px;border-radius:5px;background:#EEF1F6;color:var(--muted);font-size:10px;display:inline-flex;align-items:center;justify-content:center;cursor:help}
+  .pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .pill.warn{background:#FFF3D6;color:#8A5B00}.pill.danger{background:var(--danger-soft);color:#8C2C22}.pill.ok{background:var(--good-soft);color:var(--good)}
+  .net-v{color:var(--navy);font-weight:700}
+  .neg{color:var(--danger);font-weight:700}
+  .zero{color:var(--muted2)}
+  .detrow td{padding:0;border-bottom:1px solid #F1F4F8;background:#FBFCFE}
+  .detail{padding:16px 18px 18px}
+  .detail-note{background:#EEF1F6;border-radius:8px;padding:8px 12px;font-size:12.5px;color:var(--muted);margin-bottom:12px}
+  .dettbl{width:100%;border-collapse:collapse;margin-bottom:10px}
+  .dettbl th{font-size:10px;color:var(--muted);text-transform:uppercase;text-align:right;padding:6px 10px;border-bottom:1px solid var(--line);background:transparent;cursor:default}
+  .dettbl th:first-child{text-align:left}
+  .dettbl td{font-size:12.5px;padding:8px 10px;border-bottom:1px solid #F1F4F8;text-align:right}
+  .dettbl td:first-child{text-align:left}
+  .st{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .st.od{background:var(--danger-soft);color:#8C2C22}.st.ok{background:var(--good-soft);color:var(--good)}
+  .detail-alert{color:var(--danger);font-weight:700;font-size:12.5px;margin:8px 0 4px}
+  .alloc{font-size:12.5px;color:var(--muted);background:#F3F0FB;border-radius:8px;padding:8px 12px;margin-top:8px}
+  .alloc b{color:var(--navy)}
+
+  /* tour */
+  #backdrop{position:fixed;inset:0;z-index:9000;display:none;background:transparent}
+  #backdrop.dim{background:rgba(10,18,34,.66)}
+  #hi{position:fixed;z-index:9001;border-radius:14px;display:none;pointer-events:none;
+      box-shadow:0 0 0 3px var(--navy),0 0 0 9999px rgba(10,18,34,.62);transition:all .25s ease}
+  #card{position:fixed;z-index:9002;width:344px;max-width:92vw;background:#fff;border-radius:16px;
+        padding:18px 18px 14px;box-shadow:0 24px 70px rgba(10,20,40,.34);display:none}
+  #card .step{font-size:11px;font-weight:700;color:var(--navy2);letter-spacing:.05em;text-transform:uppercase}
+  #card h4{margin:6px 0 8px;font-size:17px;color:var(--navy)}
+  #card p{margin:0 0 14px;font-size:13.5px;color:var(--muted);line-height:1.5}
+  #card .row{display:flex;align-items:center;gap:8px}
+  #card .dots{display:flex;gap:5px;margin-right:auto}
+  #card .dots i{width:6px;height:6px;border-radius:50%;background:#D5DBE6}
+  #card .dots i.on{background:var(--navy)}
+  #card button{border:0;border-radius:10px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)}
+  #card .ghost{background:#EEF1F6;color:var(--ink)}
+  #card .go{background:var(--navy);color:#fff}
+  #card .x{position:absolute;top:12px;right:12px;background:transparent;color:var(--muted2);font-size:18px;padding:2px 6px}
+  #replay{position:fixed;right:18px;bottom:18px;z-index:8000;background:var(--navy);color:#fff;border:0;border-radius:30px;
+          padding:12px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 10px 30px rgba(20,30,50,.28);display:none;font-family:var(--font);gap:8px;align-items:center}
+  #replay svg{vertical-align:-2px;margin-right:6px}
+  @media (max-width:560px){ .kpis{grid-template-columns:1fr} .panel{overflow-x:auto} table{min-width:620px} }
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><b>BabyDoc</b><span>Financial Dashboard</span></div>
+    <div class="asat">As at 30 Jun 2026<b>Updated 11 Jun 2026</b></div>
+  </div>
+  <div class="tabs">
+    <a class="on" href="#">Accounts Payable</a>
+    <a href="#">Balance Sheet <span class="soon">Soon</span></a>
+    <a href="#">Income Statement <span class="soon">Soon</span></a>
+  </div>
+  <div class="ribbon">📘 <b>Guidebook</b> — a practice copy with sample figures. Tap anything; nothing here changes real data.</div>
+
+  <div class="wrap">
+    <div id="remStack" class="nstack" onclick="toggleRem()">
+      <div class="nstack-head"><span class="dot">!</span><span id="remCount">reminders</span><span class="chev">▾</span></div>
+      <div class="nlist" id="nlist"></div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="lab"><span class="dot" style="background:var(--navy2)"></span>Not yet due</div><div class="val num" id="kOut">—</div><div class="sub" id="kOutSub"></div></div>
+      <div class="kpi"><div class="lab"><span class="dot" style="background:var(--gold)"></span>Overdue</div><div class="val num" id="kOver">—</div><div class="sub" id="kOverSub"></div></div>
+      <div class="kpi net"><div class="lab"><span class="dot" style="background:#8FB0DC"></span>Net payable</div><div class="val num" id="kNet">—</div><div class="sub">overdue + not yet due</div></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#94A0B2" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="#94A0B2" stroke-width="2"/></svg>
+        <input id="q" type="text" placeholder="Search supplier…" oninput="render()">
+      </div>
+      <div class="seg" id="tierSeg">
+        <button class="on" data-tier="all" onclick="setTier(this)">All payables</button>
+        <button data-tier="key" onclick="setTier(this)">Key</button>
+        <button data-tier="nonkey" onclick="setTier(this)">Non-key</button>
+      </div>
+      <div class="seg" id="statSeg">
+        <button class="on" data-stat="all" onclick="setStat(this)">All</button>
+        <button data-stat="overdue" onclick="setStat(this)">Overdue</button>
+        <button data-stat="current" onclick="setStat(this)">Not yet due</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h"><h3 id="tblTitle">Suppliers</h3><span class="meta" id="tblMeta"></span></div>
+      <table>
+        <thead id="supHead"><tr>
+          <th data-k="name" onclick="sortBy('name')">Supplier</th>
+          <th data-k="inv" onclick="sortBy('inv')">Invoices</th>
+          <th data-k="nyd" onclick="sortBy('nyd')">Not yet due</th>
+          <th data-k="ov" onclick="sortBy('ov')">Overdue</th>
+          <th data-k="net" onclick="sortBy('net')">Net payable <span class="arr" id="arrNet">▾</span></th>
+          <th data-k="oldest" onclick="sortBy('oldest')">Oldest overdue</th>
+        </tr></thead>
+        <tbody id="supBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- tour -->
+  <div id="backdrop"></div>
+  <div id="hi"></div>
+  <div id="card">
+    <button class="x" onclick="endTour()" aria-label="Close">×</button>
+    <div class="step" id="cStep"></div>
+    <h4 id="cTitle"></h4>
+    <p id="cBody"></p>
+    <div class="row">
+      <div class="dots" id="cDots"></div>
+      <button class="ghost" id="cBack" onclick="tour(-1)">Back</button>
+      <button class="go" id="cNext" onclick="tour(1)">Next</button>
+    </div>
+  </div>
+  <button id="replay" onclick="startTour()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.3 5.6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M4 20v-5h5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Replay tour</button>
+
+<script>
+const fmt0 = n => new Intl.NumberFormat('en-IE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
+const fmt2 = n => new Intl.NumberFormat('en-IE',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(n);
+
+const SUP = [
+  {name:"Columbus Trading Partners",inv:39,nyd:1593,ov:25822,oldest:61,tier:"key",
+   note:"Price renegotiated from June",
+   reminder:"Final reminder before stop-supply — clear the two oldest invoices",
+   apply:20485, paid:"08 Jun 2026",
+   invoices:[
+     {ref:"INV-94334664",due:"19 Jun 2026",status:"19 d overdue",od:true,amt:13925.38},
+     {ref:"INV-94317327",due:"12 Jun 2026",status:"26 d overdue",od:true,amt:9304.78},
+     {ref:"INV-94378928",due:"01 Jul 2026",status:"not due",od:false,amt:1593.00}]},
+  {name:"Gleasure",inv:1,nyd:0,ov:17071,oldest:66,tier:"key",reminder:"Chasing payment — phoned twice this week"},
+  {name:"Bugaboo",inv:12,nyd:8200,ov:14600,oldest:47,tier:"key",reminder:"Promised a payment plan — confirm by Friday"},
+  {name:"iCandy",inv:6,nyd:12000,ov:9000,oldest:38,tier:"key"},
+  {name:"David Lowe",inv:5,nyd:9300,ov:6000,oldest:29,tier:"nonkey"},
+  {name:"Mamas & Papas",inv:9,nyd:14500,ov:3200,oldest:18,tier:"key",note:"Awaiting a credit note for returned stock"},
+  {name:"Shnuggle",inv:4,nyd:5400,ov:1900,oldest:12,tier:"nonkey"},
+  {name:"Obaby",inv:0,nyd:-4668,ov:0,oldest:0,tier:"nonkey",credit:true,note:"We've overpaid — credit to use against the next order"},
+];
+SUP.forEach(s=>s.net = s.nyd + s.ov);
+
+const ui = {tier:"all", stat:"all", sort:{k:"net",dir:-1}, open:null};
+
+function toggleRem(){ document.getElementById('remStack').classList.toggle('open'); }
+function setTier(b){ document.querySelectorAll('#tierSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); ui.tier=b.dataset.tier; render(); }
+function setStat(b){ document.querySelectorAll('#statSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); ui.stat=b.dataset.stat; render(); }
+function sortBy(k){
+  if(ui.sort.k===k) ui.sort.dir*=-1; else ui.sort={k,dir:(k==='name'?1:-1)};
+  document.querySelectorAll('thead th .arr').forEach(a=>a.remove());
+  const th=document.querySelector('thead th[data-k="'+k+'"]');
+  th.insertAdjacentHTML('beforeend',' <span class="arr">'+(ui.sort.dir<0?'▾':'▴')+'</span>');
+  render();
+}
+
+function reminders(){ return SUP.filter(s=>s.reminder); }
+
+function renderReminders(){
+  const r=reminders();
+  document.getElementById('remCount').textContent = r.length+' reminder'+(r.length===1?'':'s')+' · tap to open';
+  document.getElementById('nlist').innerHTML = r.map(s=>
+    '<div class="nrow"><span class="who">'+s.name+'</span><span class="msg">'+s.reminder+'</span></div>').join('');
+}
+
+function renderKPIs(rows){
+  const nyd=rows.reduce((a,s)=>a+s.nyd,0), ov=rows.reduce((a,s)=>a+s.ov,0), net=rows.reduce((a,s)=>a+s.net,0);
+  document.getElementById('kOut').textContent=fmt0(nyd);
+  document.getElementById('kOver').textContent=fmt0(ov);
+  document.getElementById('kNet').textContent=fmt0(net);
+  document.getElementById('kOutSub').textContent=rows.length+' suppliers';
+  document.getElementById('kOverSub').textContent=(net>0?Math.round(ov/net*100):0)+'% of net payable';
+}
+
+function amtCell(v){
+  if(Math.abs(v)<0.5) return '<span class="zero">—</span>';
+  return v<0 ? '<span class="neg num">'+fmt0(v)+'</span>' : '<span class="num">'+fmt0(v)+'</span>';
+}
+
+function detailHTML(s,idx){
+  let h='<div class="detail" id="detail-'+idx+'">';
+  if(s.note) h+='<div class="detail-note">✎ '+s.note+'</div>';
+  if(s.invoices){
+    h+='<table class="dettbl"><thead><tr><th>Invoice</th><th>Due date</th><th>Status</th><th>Amount</th></tr></thead><tbody>';
+    s.invoices.forEach(i=>{ h+='<tr><td>'+i.ref+'</td><td>'+i.due+'</td><td><span class="st '+(i.od?'od':'ok')+'">'+i.status+'</span></td><td class="num">'+fmt2(i.amt)+'</td></tr>'; });
+    h+='</tbody></table>';
+  } else {
+    h+='<div class="detail-note" style="background:#fff;border:1px dashed var(--line)">In the live dashboard, every invoice for this supplier is listed here with its due date and status.</div>';
+  }
+  if(s.reminder) h+='<div class="detail-alert">! '+s.reminder+'</div>';
+  if(s.apply) h+='<div class="alloc">'+fmt0(s.apply)+' paid on '+s.paid+', not yet allocated — applied to the oldest invoices first. Net payable <b>'+fmt0(s.net)+'</b>.</div>';
+  else if(s.credit) h+='<div class="alloc">This supplier is <b>in credit</b> '+fmt0(-s.net)+' — we can set it against the next invoice.</div>';
+  h+='</div>';
+  return h;
+}
+
+function render(){
+  const q=(document.getElementById('q').value||'').toLowerCase().trim();
+  let rows=SUP.filter(s=>{
+    if(ui.tier!=='all' && s.tier!==ui.tier) return false;
+    if(ui.stat==='overdue' && s.ov<=0) return false;
+    if(ui.stat==='current' && s.nyd<=0) return false;
+    if(q && !s.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderKPIs(rows);
+  const k=ui.sort.k, dir=ui.sort.dir;
+  rows=[...rows].sort((a,b)=> k==='name' ? a.name.localeCompare(b.name)*dir : (a[k]-b[k])*dir );
+
+  const tier = ui.tier==='key'?'Key ':ui.tier==='nonkey'?'Non-key ':'';
+  document.getElementById('tblTitle').textContent = tier+'Suppliers'+(ui.stat==='overdue'?' · overdue':ui.stat==='current'?' · not yet due':'');
+  document.getElementById('tblMeta').textContent = rows.length+' suppliers · net '+fmt0(rows.reduce((a,s)=>a+s.net,0));
+
+  const body=document.getElementById('supBody'); body.innerHTML='';
+  rows.forEach(s=>{
+    const idx=SUP.indexOf(s);
+    const open = ui.open===idx;
+    const tr=document.createElement('tr'); tr.className='sup'+(open?' open':'');
+    tr.onclick=()=>{ ui.open = open?null:idx; render(); };
+    const oldPill = s.oldest>0 ? '<span class="pill '+(s.oldest>90?'danger':'warn')+'">'+s.oldest+' d</span>' : '<span class="pill ok">current</span>';
+    const flag = s.reminder ? '<span class="flag">!</span>' : '';
+    const note = s.note ? '<span class="noteico" title="'+s.note.replace(/"/g,'')+'">✎</span>' : '';
+    const credit = s.net<0 ? ' <span class="pill ok">in credit '+fmt0(-s.net)+'</span>' : '';
+    const netCell = s.net<0 ? '<span class="neg num">'+fmt0(s.net)+'</span>' : (Math.abs(s.net)<0.5?'<span class="zero">—</span>':'<span class="net-v num">'+fmt0(s.net)+'</span>');
+    tr.innerHTML =
+      '<td><div class="supname"><span class="ch">▸</span>'+s.name+flag+note+credit+'</div></td>'+
+      '<td class="num">'+s.inv+'</td>'+
+      '<td>'+amtCell(s.nyd)+'</td>'+
+      '<td>'+amtCell(s.ov)+'</td>'+
+      '<td>'+netCell+'</td>'+
+      '<td>'+oldPill+'</td>';
+    body.appendChild(tr);
+    if(open){
+      const dr=document.createElement('tr'); dr.className='detrow';
+      dr.innerHTML='<td colspan="6">'+detailHTML(s,idx)+'</td>';
+      body.appendChild(dr);
+    }
+  });
+}
+
+/* ---------------- guided tour ---------------- */
+const STEPS=[
+  {title:"Welcome", body:"A quick tour of your view-only dashboard. Use Next and Back to move through it. Afterwards you can explore freely — nothing here ever changes the data."},
+  {el:".kpis", title:"The three numbers", body:"Your headline. Not yet due (bills not due yet) plus Overdue (past their due date) equals Net payable — what we actually owe now, after payments already made. It ties to the ledger."},
+  {el:"#remStack", title:"Reminders", body:"Important notes from finance sit in red at the very top. They stack like phone alerts — tap to open them all.", before:()=>{ document.getElementById('remStack').classList.add('open'); }},
+  {el:".toolbar", title:"Search & filter", body:"Find a supplier by name, or use the toggles to narrow the view — only Key suppliers, or only what's Overdue. Every total updates to match."},
+  {el:"#supHead", title:"The supplier list", body:"Every supplier, split across the columns. Tap any heading to sort. A red ! marks a reminder, ✎ means there's a note, and a red figure tagged “in credit” means we've overpaid."},
+  {el:"#detail-0", title:"Open a supplier", body:"Tap a row to open its invoices, due dates and status — plus any note, reminder, and the “paid, not yet allocated” line showing the Net payable.", before:()=>{ ui.open=0; render(); }},
+  {title:"You're set", body:"That's the whole dashboard. Explore freely — tap rows, sort columns, filter and search. Replay this tour anytime from the button in the corner."},
+];
+let ti=0, touring=false;
+const $ = s=>document.querySelector(s);
+
+function startTour(){ touring=true; ti=0; document.getElementById('replay').style.display='none'; document.getElementById('backdrop').style.display='block'; document.getElementById('card').style.display='block'; showStep(); }
+function tour(d){ const n=ti+d; if(n<0)return; if(n>=STEPS.length){ endTour(); return;} ti=n; showStep(); }
+function endTour(){ touring=false; ['backdrop','hi','card'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('backdrop').classList.remove('dim'); document.getElementById('replay').style.display='inline-flex'; }
+
+function showStep(){
+  const s=STEPS[ti];
+  if(s.before) s.before();
+  // dots + text
+  document.getElementById('cStep').textContent = (ti===0||ti===STEPS.length-1)?'Guided tour':('Step '+ti+' of '+(STEPS.length-2));
+  document.getElementById('cTitle').textContent=s.title;
+  document.getElementById('cBody').textContent=s.body;
+  document.getElementById('cBack').style.visibility = ti===0?'hidden':'visible';
+  document.getElementById('cNext').textContent = ti===STEPS.length-1?'Done':'Next';
+  document.getElementById('cDots').innerHTML = STEPS.map((_,i)=>'<i class="'+(i===ti?'on':'')+'"></i>').join('');
+  const hi=document.getElementById('hi'), bd=document.getElementById('backdrop');
+  const t = s.el ? document.querySelector(s.el) : null;
+  if(t){
+    bd.classList.remove('dim');
+    t.scrollIntoView({block:'center'});
+    requestAnimationFrame(()=>place(t));
+  } else {
+    bd.classList.add('dim'); hi.style.display='none'; centerCard();
+  }
+}
+function place(t){
+  const hi=document.getElementById('hi'), card=document.getElementById('card');
+  const r=t.getBoundingClientRect(); const p=8;
+  hi.style.display='block';
+  hi.style.left=(r.left-p)+'px'; hi.style.top=(r.top-p)+'px';
+  hi.style.width=(r.width+p*2)+'px'; hi.style.height=(r.height+p*2)+'px';
+  const cw=card.offsetWidth, chh=card.offsetHeight, m=14, vw=innerWidth, vh=innerHeight;
+  let top = r.bottom+m+chh < vh ? r.bottom+m : (r.top-m-chh>0 ? r.top-m-chh : Math.max(m,(vh-chh)/2));
+  let left = Math.min(Math.max(m, r.left + r.width/2 - cw/2), vw-cw-m);
+  card.style.left=left+'px'; card.style.top=top+'px';
+}
+function centerCard(){
+  const card=document.getElementById('card');
+  card.style.left=Math.max(14,(innerWidth-card.offsetWidth)/2)+'px';
+  card.style.top=Math.max(14,(innerHeight-card.offsetHeight)/2)+'px';
+}
+addEventListener('resize',()=>{ if(touring) showStep(); });
+addEventListener('keydown',e=>{ if(!touring)return; if(e.key==='ArrowRight'||e.key==='Enter')tour(1); if(e.key==='ArrowLeft')tour(-1); if(e.key==='Escape')endTour(); });
+
+/* init */
+renderReminders(); render();
+setTimeout(startTour, 450);
+</script>
+</body>
+</html>
