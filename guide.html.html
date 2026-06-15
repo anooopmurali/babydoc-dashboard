@@ -3,385 +3,1587 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BabyDoc — Dashboard Guidebook</title>
+<title>Accounts Payable · BabyDoc Shop</title>
 <style>
-  :root{
-    --navy:#16294D; --navy2:#21416F; --ink:#1B2536; --muted:#5E6A7B; --muted2:#94A0B2;
-    --line:#E6EAF1; --bg:#F4F6FA; --card:#fff; --good:#2E7D6B; --good-soft:#E6F2EF;
-    --gold:#B26B00; --danger:#B23A2E; --danger-soft:#FBE9E7; --soft:#EAF0F8;
-    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0}
-  body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45}
-  .num{font-variant-numeric:tabular-nums}
-  .wrap{max-width:1040px;margin:0 auto;padding:0 18px 80px}
+:root{
+  --navy:#16294D;        /* BabyDoc deep navy */
+  --navy-2:#21416F;
+  --navy-soft:#EAF0F8;
+  --bg:#F6F7F9;
+  --card:#FFFFFF;
+  --ink:#172033;
+  --muted:#7A8597;
+  --muted-2:#9AA4B2;
+  --line:#E8EBF0;
+  --line-strong:#DDE2EA;
+  --good:#2E7D6B;        /* in-credit / not due */
+  --good-soft:#E6F2EF;
+  --warn:#B26B00;        /* overdue */
+  --warn-soft:#FBF0DF;
+  --danger:#B23A2E;      /* badly overdue */
+  --danger-soft:#FBE9E7;
+  --apply:#5B4B9E;       /* payments to apply */
+  --apply-soft:#EEEAF7;
+  --radius:16px;
+  --shadow:0 1px 2px rgba(23,32,51,.04), 0 8px 24px rgba(23,32,51,.06);
+  --shadow-sm:0 1px 2px rgba(23,32,51,.05);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+*,*::before,*::after{transition:none !important;animation:none !important}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;
+  line-height:1.45;
+}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+.ap-grid{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:24px;align-items:start}
+.ap-side{padding-top:30px}
+.side-h{font-size:14px;font-weight:700;color:var(--navy);margin:0 0 12px}
+.top5card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;box-shadow:var(--shadow-sm);text-align:center}
+.top5card .t5-name{font-weight:700;font-size:17px;color:var(--ink);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.top5card .t5-row{display:flex;gap:10px}
+.top5card .t5-cell{flex:1;text-align:center}
+.t5-lab{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700}
+.t5-val{font-size:15px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.t5-val.neg{color:var(--danger)}
+.t5-net{font-size:11px;color:var(--muted-2);margin-top:9px;border-top:1px solid var(--line);padding-top:7px;text-align:center}
+.cashhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.cashhead h3{margin:0}
+@media(max-width:980px){ .ap-grid{grid-template-columns:1fr} .ap-side{padding-top:0} }
 
-  /* top bar */
-  .topbar{background:var(--navy);color:#fff;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .brand{display:flex;flex-direction:column}
-  .brand b{font-size:17px;font-style:italic;letter-spacing:.2px}
-  .brand span{font-size:11px;color:#9DB3D4}
-  .asat{text-align:right;font-size:11px;color:#9DB3D4}
-  .asat b{display:block;color:#fff;font-size:12px;margin-top:2px}
-  .tabs{display:flex;gap:18px;padding:10px 22px 0;background:var(--navy)}
-  .tabs a{font-size:12.5px;color:#9DB3D4;text-decoration:none;padding-bottom:9px;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px}
-  .tabs a.on{color:#fff;font-weight:700;border-color:#fff}
-  .tabs .soon{font-size:8.5px;background:#2B4068;color:#AFC0DC;padding:2px 6px;border-radius:20px}
+/* ---------- top bar (navy, brand-forward) ---------- */
+.topbar{
+  position:sticky;top:0;z-index:30;
+  background:rgba(18,33,61,.92);
+  backdrop-filter:saturate(160%) blur(16px);
+  -webkit-backdrop-filter:saturate(160%) blur(16px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.topbar .wrap{display:flex;align-items:center;gap:16px;height:68px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand img{height:30px;width:auto;display:block}
+.brand .fallback{font-weight:700;letter-spacing:-.01em;color:#fff;font-size:18px;white-space:nowrap}
+.brand .sep{width:1px;height:26px;background:rgba(255,255,255,.18)}
+.brand .ttl{font-size:15px;font-weight:600;letter-spacing:-.01em;color:#fff;white-space:nowrap}
+.brand .ttl small{display:block;font-size:11.5px;font-weight:500;color:#9DB3D4;letter-spacing:0}
+.topbar .spacer{flex:1}
+.updated{font-size:12px;color:#9DB3D4;text-align:right;line-height:1.3;white-space:nowrap}
+.updated b{color:#fff;font-weight:600}
+.modeswitch{display:flex;background:rgba(255,255,255,.10);border-radius:10px;padding:3px;gap:2px}
+.modeswitch button{
+  border:0;background:transparent;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;
+  color:#9DB3D4;padding:6px 13px;border-radius:8px;transition:.18s
+}
+.modeswitch button.on{background:#fff;color:var(--navy);box-shadow:var(--shadow-sm)}
+.btn{
+  border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;
+  font:inherit;font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:10px;
+  display:inline-flex;align-items:center;gap:7px;transition:.18s;white-space:nowrap
+}
+.btn:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35)}
+.btn svg{width:14px;height:14px}
 
-  .ribbon{background:#FFF6E6;border-bottom:1px solid #F0DFB8;color:#7A5B14;font-size:12.5px;padding:8px 22px;text-align:center}
-  .ribbon b{color:#5E4406}
+/* ---------- hero kpis ---------- */
+.hero{padding:30px 0 8px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2);margin:0 0 4px}
+.context{font-size:13px;color:var(--muted);margin:2px 0 22px}
+.context b{color:var(--navy);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.kpi{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px 20px 18px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden
+}
+.kpi .lab{font-size:12.5px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:7px}
+.kpi .dot{width:7px;height:7px;border-radius:50%}
+.kpi .val{font-size:30px;font-weight:680;letter-spacing:-.02em;margin:10px 0 2px;line-height:1.05}
+.kpi .sub{font-size:12px;color:var(--muted-2)}
+.kpi.accent-net{background:var(--navy);border-color:var(--navy)}
+.kpi.accent-net .lab,.kpi.accent-net .sub{color:#AFC0DC}
+.kpi.accent-net .val{color:#fff}
+.kpinotes{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;font-size:12.5px;color:var(--muted)}
+.kpinotes b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.kpinotes .recon{padding-right:22px;border-right:1px solid var(--line)}
+.cashdue-wrap h3 span{font-weight:500;color:var(--muted-2);font-size:12px;margin-left:6px}
+.cashdue{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:6px}
+.cd{border:1px solid var(--line);border-radius:12px;padding:12px 12px 11px;background:#fff;cursor:pointer;position:relative;transition:border-color .15s,box-shadow .15s}
+.cd:hover{border-color:var(--muted-2)}
+.cd.open{border-color:var(--navy);box-shadow:0 0 0 2px rgba(22,41,77,.12)}
+.cd-chev{margin-left:auto;color:var(--muted-2);font-size:11px;transition:transform .18s}
+.cd.open .cd-chev{transform:rotate(90deg)}
+.cd-cnt{font-size:10.5px;color:var(--muted-2);margin-top:3px}
+.cashdetail{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.cdd-h{display:flex;align-items:center;font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.cdd-x{margin-left:auto;border:0;background:transparent;color:var(--muted-2);font-size:17px;line-height:1;cursor:pointer;padding:0 4px}
+.cdd-x:hover{color:var(--ink)}
+.cdd-list{max-height:230px;overflow:auto}
+.cdd-row{display:flex;justify-content:space-between;gap:12px;padding:7px 4px;border-bottom:1px solid #F1F4F8;font-size:13px}
+.cdd-row:last-child{border-bottom:0}
+.cdd-s{color:var(--ink)}
+.cd-lab{font-size:11.5px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:6px}
+.cd-lab::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted-2)}
+.cd-val{font-size:19px;font-weight:680;letter-spacing:-.01em;margin-top:7px}
+.cd-now .cd-lab::before{background:var(--danger)} .cd-now{background:var(--danger-soft);border-color:#F0C9C4}
+.cd-7 .cd-lab::before{background:var(--gold)} .cd-30 .cd-lab::before{background:#C9A24B}
+.cd-90 .cd-lab::before{background:var(--navy-2)} .cd-far .cd-lab::before{background:#8FB0DC}
+.attnbtn{color:var(--muted);border-color:var(--line-strong);background:#fff}
+.attnbtn:hover{background:#FAFBFD;border-color:var(--muted-2)}
+.attnbtn.on{background:var(--danger-soft);border-color:#F0C9C4;color:#8C2C22}
+@media(max-width:760px){ .cashdue{grid-template-columns:repeat(2,1fr)} }
 
-  /* reminders */
-  .nstack{margin:18px 0 0;cursor:pointer;user-select:none}
-  .nstack-head{position:relative;background:var(--danger-soft);border:1px solid #F0C9C4;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;color:#8C2C22;font-weight:700;font-size:14px}
-  .nstack-head .dot{width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
-  .nstack-head .chev{margin-left:auto;transition:transform .2s}
-  .nstack.open .nstack-head .chev{transform:rotate(180deg)}
-  .nstack::before,.nstack::after{content:"";display:block;height:0;margin:0 6px;border-radius:12px}
-  .nstack:not(.open)::before{content:"";display:block;height:6px;margin:0 6px;background:#FCEFEC;border:1px solid #F4D7D2;border-top:0;border-radius:0 0 12px 12px}
-  .nlist{display:none;margin-top:8px;border:1px solid #F0C9C4;border-radius:12px;overflow:hidden}
-  .nstack.open .nlist{display:block;animation:fade .25s ease}
-  .nrow{padding:11px 16px;display:flex;gap:10px;align-items:flex-start;border-top:1px solid #F6DDD8;background:#fff}
-  .nrow:first-child{border-top:0}
-  .nrow .who{font-weight:700;color:#8C2C22;font-size:13px;white-space:nowrap}
-  .nrow .msg{color:#7A4B45;font-size:13px}
-  @keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+/* ---------- controls ---------- */
+.controls{display:flex;align-items:center;gap:12px;margin:26px 0 16px;flex-wrap:wrap}
+.search{position:relative;flex:1;min-width:220px;max-width:340px}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted-2)}
+.search input{
+  width:100%;border:1px solid var(--line-strong);background:#fff;border-radius:11px;
+  padding:10px 12px 10px 36px;font:inherit;font-size:13.5px;color:var(--ink);transition:.18s
+}
+.search input:focus{outline:none;border-color:var(--navy-2);box-shadow:0 0 0 3px rgba(33,65,111,.12)}
+.segmented{display:flex;background:#EDEFF3;border-radius:11px;padding:3px;gap:2px}
+.segmented button{
+  border:0;background:transparent;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;
+  color:var(--muted);padding:7px 14px;border-radius:8px;transition:.18s;white-space:nowrap
+}
+.segmented button.on{background:#fff;color:var(--navy);box-shadow:var(--shadow-sm)}
+.clearsel{margin-left:auto}
 
-  /* kpis */
-  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 14px}
-  .kpi .lab{font-size:12.5px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:7px}
-  .kpi .dot{width:7px;height:7px;border-radius:50%}
-  .kpi .val{font-size:30px;font-weight:680;letter-spacing:-.02em;margin:10px 0 2px;line-height:1.05}
-  .kpi .sub{font-size:12px;color:var(--muted2)}
-  .kpi.net{background:var(--navy);border-color:var(--navy)}
-  .kpi.net .lab,.kpi.net .sub{color:#AFC0DC}
-  .kpi.net .val{color:#fff}
+/* ---------- aging strip ---------- */
+.aging{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm);margin-bottom:18px}
+.aging h3{margin:0 0 14px;font-size:13px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+.aging h3 span{font-weight:500;color:var(--muted);font-size:12px}
+.agebar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#F0F2F5}
+.agebar div{height:100%;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.agelegend{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 18px;margin-top:14px}
+.agelegend .it{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
+.agelegend .sw{width:10px;height:10px;border-radius:3px}
+.agelegend .am{color:var(--ink);font-weight:600;margin-left:2px}
 
-  /* toolbar */
-  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:20px}
-  .search{flex:1;min-width:200px;position:relative}
-  .search input{width:100%;padding:10px 12px 10px 34px;border:1px solid var(--line);border-radius:11px;font-size:14px;background:#fff;font-family:var(--font)}
-  .search svg{position:absolute;left:11px;top:11px}
-  .seg{display:inline-flex;background:#EDEFF3;border-radius:11px;padding:3px}
-  .seg button{border:0;background:transparent;padding:7px 12px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--font)}
-  .seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(20,30,50,.12)}
+/* ---------- table ---------- */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.panel .head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.panel .head h3{margin:0;font-size:14px;font-weight:600}
+.panel .head .meta{font-size:12px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  text-align:right;font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.02em;
+  padding:11px 16px;border-bottom:1px solid var(--line);background:#FBFCFD;cursor:pointer;user-select:none;white-space:nowrap
+}
+thead th:first-child{text-align:left}
+thead th.nosort{cursor:default}
+thead th .arr{opacity:.45;font-size:9px;margin-left:3px}
+tbody td{padding:13px 16px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+tbody td:first-child{text-align:left}
+tbody tr{cursor:pointer;transition:background .12s}
+tbody tr:hover{background:#FAFBFD}
+tbody tr.sel{background:var(--navy-soft)}
+tbody tr:last-child td{border-bottom:0}
+.supname{font-weight:600;color:var(--ink);display:flex;align-items:center;gap:9px}
+.supname .ch{color:var(--muted-2);transition:transform .2s;font-size:10px}
+tr.sel .supname .ch{transform:rotate(90deg)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;line-height:1.6}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.danger{background:var(--danger-soft);color:var(--danger)}
+.pill.ok{background:var(--good-soft);color:var(--good)}
+.pill.muted{background:#EEF0F3;color:var(--muted)}
+.apply-amt{color:var(--apply);font-weight:600}
+.neg{color:var(--good)}
+.net{font-weight:700;color:var(--navy)}
+.zero{color:var(--muted-2)}
 
-  /* table */
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-top:16px;overflow:hidden}
-  .panel-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
-  .panel-h h3{margin:0;font-size:15px}
-  .panel-h .meta{font-size:12px;color:var(--muted2)}
-  table{width:100%;border-collapse:collapse}
-  thead th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;text-align:right;padding:11px 14px;cursor:pointer;white-space:nowrap;border-bottom:1px solid var(--line);background:#fff}
-  thead th:first-child{text-align:left}
-  thead th .arr{color:var(--navy);font-size:10px}
-  tbody td{padding:12px 14px;border-bottom:1px solid #F1F4F8;text-align:right;font-size:13.5px}
-  tbody td:first-child{text-align:left}
-  tbody tr.sup{cursor:pointer}
-  tbody tr.sup:hover{background:#FAFBFD}
-  .supname{display:flex;align-items:center;gap:8px;font-weight:600}
-  .ch{color:var(--muted2);transition:transform .18s;display:inline-block;font-size:11px}
-  tr.sup.open .ch{transform:rotate(90deg)}
-  .flag{width:16px;height:16px;border-radius:50%;background:var(--danger);color:#fff;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
-  .noteico{width:16px;height:16px;border-radius:5px;background:#EEF1F6;color:var(--muted);font-size:10px;display:inline-flex;align-items:center;justify-content:center;cursor:help}
-  .pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
-  .pill.warn{background:#FFF3D6;color:#8A5B00}.pill.danger{background:var(--danger-soft);color:#8C2C22}.pill.ok{background:var(--good-soft);color:var(--good)}
-  .net-v{color:var(--navy);font-weight:700}
-  .neg{color:var(--danger);font-weight:700}
-  .zero{color:var(--muted2)}
-  .detrow td{padding:0;border-bottom:1px solid #F1F4F8;background:#FBFCFE}
-  .detail{padding:16px 18px 18px}
-  .detail-note{background:#EEF1F6;border-radius:8px;padding:8px 12px;font-size:12.5px;color:var(--muted);margin-bottom:12px}
-  .dettbl{width:100%;border-collapse:collapse;margin-bottom:10px}
-  .dettbl th{font-size:10px;color:var(--muted);text-transform:uppercase;text-align:right;padding:6px 10px;border-bottom:1px solid var(--line);background:transparent;cursor:default}
-  .dettbl th:first-child{text-align:left}
-  .dettbl td{font-size:12.5px;padding:8px 10px;border-bottom:1px solid #F1F4F8;text-align:right}
-  .dettbl td:first-child{text-align:left}
-  .st{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
-  .st.od{background:var(--danger-soft);color:#8C2C22}.st.ok{background:var(--good-soft);color:var(--good)}
-  .detail-alert{color:var(--danger);font-weight:700;font-size:12.5px;margin:8px 0 4px}
-  .alloc{font-size:12.5px;color:var(--muted);background:#F3F0FB;border-radius:8px;padding:8px 12px;margin-top:8px}
-  .alloc b{color:var(--navy)}
+/* invoice detail */
+.detailrow td{padding:0;background:#FBFCFE;border-bottom:1px solid var(--line)}
+.detailwrap{padding:6px 16px 14px 40px}
+.detailwrap table{font-size:12.5px;width:100%}
+.detailwrap thead th{background:transparent;border-bottom:1px solid var(--line);padding:9px 12px;cursor:default;text-align:left}
+.detailwrap tbody td{padding:9px 12px;text-align:left}
+.detailwrap th.amt,.detailwrap td:last-child{text-align:right}
+#supTable th.oldcol,#supTable td.oldcol{text-align:right}
+.detailwrap tbody tr{cursor:default}
+.detailwrap tbody tr:hover{background:transparent}
 
-  /* tour */
-  #backdrop{position:fixed;inset:0;z-index:9000;display:none;background:transparent}
-  #backdrop.dim{background:rgba(10,18,34,.66)}
-  #hi{position:fixed;z-index:9001;border-radius:14px;display:none;pointer-events:none;
-      box-shadow:0 0 0 3px var(--navy),0 0 0 9999px rgba(10,18,34,.62);transition:all .25s ease}
-  #card{position:fixed;z-index:9002;width:344px;max-width:92vw;background:#fff;border-radius:16px;
-        padding:18px 18px 14px;box-shadow:0 24px 70px rgba(10,20,40,.34);display:none}
-  #card .step{font-size:11px;font-weight:700;color:var(--navy2);letter-spacing:.05em;text-transform:uppercase}
-  #card h4{margin:6px 0 8px;font-size:17px;color:var(--navy)}
-  #card p{margin:0 0 14px;font-size:13.5px;color:var(--muted);line-height:1.5}
-  #card .row{display:flex;align-items:center;gap:8px}
-  #card .dots{display:flex;gap:5px;margin-right:auto}
-  #card .dots i{width:6px;height:6px;border-radius:50%;background:#D5DBE6}
-  #card .dots i.on{background:var(--navy)}
-  #card button{border:0;border-radius:10px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)}
-  #card .ghost{background:#EEF1F6;color:var(--ink)}
-  #card .go{background:var(--navy);color:#fff}
-  #card .x{position:absolute;top:12px;right:12px;background:transparent;color:var(--muted2);font-size:18px;padding:2px 6px}
-  #replay{position:fixed;right:18px;bottom:18px;z-index:8000;background:var(--navy);color:#fff;border:0;border-radius:30px;
-          padding:12px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 10px 30px rgba(20,30,50,.28);display:none;font-family:var(--font);gap:8px;align-items:center}
-  #replay svg{vertical-align:-2px;margin-right:6px}
-  @media (max-width:560px){ .kpis{grid-template-columns:1fr} .panel{overflow-x:auto} table{min-width:620px} }
-  @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+/* ---------- payments to apply panel ---------- */
+.apply-panel{margin-top:18px}
+.apply-panel .head{background:linear-gradient(0deg,#fff,#fff)}
+.applybadge{display:inline-flex;align-items:center;gap:6px;background:var(--apply-soft);color:var(--apply);font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px}
+.applyform{display:flex;gap:10px;padding:16px 20px;flex-wrap:wrap;align-items:flex-end;border-bottom:1px solid var(--line)}
+.applyform .fld{display:flex;flex-direction:column;gap:5px}
+.applyform label{font-size:11.5px;font-weight:600;color:var(--muted)}
+.applyform select,.applyform input{
+  border:1px solid var(--line-strong);background:#fff;border-radius:10px;padding:9px 11px;font:inherit;font-size:13px;color:var(--ink)
+}
+.applyform select{min-width:200px}
+.applyform input.amt{width:130px;text-align:right}
+.applyform input.note{width:180px}
+.applyform select:focus,.applyform input:focus{outline:none;border-color:var(--apply);box-shadow:0 0 0 3px rgba(91,75,158,.12)}
+.addbtn{background:var(--apply);color:#fff;border:0;border-radius:10px;padding:10px 16px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:.18s}
+.addbtn:hover{filter:brightness(1.07)}
+.applylist{padding:6px 8px}
+.applyitem{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;transition:background .12s}
+.applyitem:hover{background:#FAFBFD}
+.applyitem .a-sup{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.applyitem .a-note{color:var(--muted);font-size:12px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.applyitem .a-date{color:var(--muted-2);font-size:12px}
+.applyitem .a-amt{color:var(--apply);font-weight:700}
+.applyitem .del{border:0;background:transparent;color:var(--muted-2);cursor:pointer;font-size:17px;line-height:1;padding:2px 6px;border-radius:6px;transition:.15s}
+.applyitem .del:hover{background:var(--danger-soft);color:var(--danger)}
+.applytotal{display:flex;align-items:center;gap:12px;padding:13px 12px;margin-top:4px;border-top:2px solid var(--line)}
+.applytotal .a-sup{font-weight:700;flex:1;color:var(--ink)}
+.applytotal .a-amt{color:var(--apply);font-weight:800;font-size:15px}
+.applytotal .a-cnt{color:var(--muted-2);font-size:12px;min-width:84px;text-align:right}
+.empty{padding:26px 20px;text-align:center;color:var(--muted);font-size:13px}
+.viewer-hidden{display:none!important}
+
+.footnote{text-align:center;color:var(--muted-2);font-size:11.5px;padding:30px 0 40px}
+.footnote a{color:var(--navy-2);text-decoration:none}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--navy);color:#fff;font-size:13px;font-weight:500;padding:11px 18px;border-radius:12px;
+  box-shadow:0 10px 30px rgba(23,32,51,.25);opacity:0;pointer-events:none;transition:.3s;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:860px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .brand .ttl small{display:none}
+  .topbar .wrap{height:60px;gap:12px}
+  .hide-sm{display:none}
+}
+@media (max-width:560px){
+  .wrap{padding:0 14px}
+  .kpis{grid-template-columns:1fr 1fr}
+  .kpi .val{font-size:24px}
+}
+/* ---------- page nav ---------- */
+.pagenav{position:sticky;top:68px;z-index:25;background:rgba(255,255,255,.86);backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--line)}
+.pagenav .wrap{display:flex;gap:4px;height:50px;align-items:center}
+.pagenav button{
+  border:0;background:transparent;cursor:pointer;font:inherit;font-size:13.5px;font-weight:600;
+  color:var(--muted);padding:8px 16px;border-radius:9px;position:relative;transition:.16s;display:flex;align-items:center;gap:8px
+}
+.pagenav button:hover{color:var(--ink);background:#F1F3F6}
+.pagenav button.on{color:var(--navy)}
+.pagenav button.on::after{content:"";position:absolute;left:16px;right:16px;bottom:-13px;height:2.5px;border-radius:2px;background:var(--navy)}
+.pagenav .soon{font-size:10px;font-weight:600;color:var(--muted-2);background:#EEF0F3;padding:1px 7px;border-radius:999px}
+.page{display:none}
+.page.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* coming soon */
+.coming{min-height:56vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px}
+.coming .ic{width:64px;height:64px;border-radius:18px;background:var(--navy-soft);display:flex;align-items:center;justify-content:center;color:var(--navy-2);margin-bottom:22px}
+.coming .ic svg{width:30px;height:30px}
+.coming h2{margin:0 0 8px;font-size:26px;font-weight:680;letter-spacing:-.02em;color:var(--ink)}
+.coming .badge{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--navy-2);background:var(--navy-soft);padding:5px 12px;border-radius:999px;margin-bottom:18px}
+.coming p{margin:0;max-width:440px;color:var(--muted);font-size:14px;line-height:1.6}
+
+/* tier toggle + badges */
+.tierseg button.on{color:var(--navy)}
+.tierbadge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.02em}
+.tierbadge.key{background:var(--navy-soft);color:var(--navy-2)}
+.tierbadge.nonkey{background:#EEF0F3;color:var(--muted)}
+.tierbadge.unclassified{background:var(--warn-soft);color:var(--warn)}
+.classbtns{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle}
+.classbtns button{border:1px solid var(--line-strong);background:#fff;color:var(--muted);cursor:pointer;font:inherit;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:7px;transition:.14s}
+.classbtns button:hover{border-color:var(--navy-2);color:var(--navy)}
+.notice{display:flex;align-items:center;gap:10px;background:var(--warn-soft);color:var(--warn);border:1px solid #F0D9AE;border-radius:12px;padding:11px 15px;font-size:12.5px;font-weight:600;margin-bottom:14px}
+.notice button{margin-left:auto;border:0;background:var(--warn);color:#fff;font:inherit;font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer}
+
+/* editable tier buttons */
+.classbtns button.act{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* alert badge on supplier row */
+.alertdot{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:6px;margin-left:7px;vertical-align:middle;font-size:11px;font-weight:800;cursor:default;background:var(--danger-soft);color:var(--danger)}
+.notebadge{position:relative;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:6px;margin-left:6px;vertical-align:middle;font-size:11px;background:#EEF1F6;color:var(--muted);cursor:help}
+.notebadge .tip{display:none;position:absolute;left:50%;bottom:130%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:12px;font-weight:500;line-height:1.4;padding:8px 11px;border-radius:9px;width:max-content;max-width:260px;white-space:normal;box-shadow:0 8px 24px rgba(11,22,45,.28);z-index:40;text-align:left}
+.notebadge .tip::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--navy)}
+.notebadge:hover .tip{display:block}
+.detail-note{display:flex;gap:9px;align-items:flex-start;margin:2px 0 10px;padding:9px 12px;background:#EEF1F6;border-radius:9px;font-size:12.5px;color:var(--ink)}
+.detail-note .ni{color:var(--muted)}
+.alloc-note{padding:10px 12px 2px;font-size:12.5px;color:var(--muted)}
+
+/* reminders — iOS-style collapsible stack (all red) */
+.alertstrip{padding:18px 0 0}
+.alertstrip:empty{display:none}
+.nstack{position:relative}
+.nstack-head{width:100%;display:flex;align-items:center;gap:11px;text-align:left;cursor:pointer;
+  background:var(--danger-soft);border:1px solid #F0C9C4;border-radius:13px;padding:12px 16px;color:#8C2C22;font-size:13px;
+  box-shadow:0 6px 0 -3px #FCEFEC, 0 10px 0 -6px #FBE4E0}   /* stacked-card peek */
+.nstack-head .ic{flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:12px;font-weight:800;background:var(--danger);color:#fff}
+.nstack-head .nstack-sum{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nstack-head .chev{opacity:.7;font-size:12px}
+.nstack.open .nstack-head{box-shadow:none;border-bottom-left-radius:0;border-bottom-right-radius:0}
+.nstack-head .chev{transition:transform .25s ease}
+.nstack.open .nstack-head .chev{transform:rotate(180deg)}
+.nstack.open .nstack-list{animation:nslide .28s cubic-bezier(.4,0,.2,1)}
+.nstack-list .alertchip{animation:nchip .32s cubic-bezier(.4,0,.2,1) both}
+.nstack-list .alertchip:nth-child(2){animation-delay:.04s}
+.nstack-list .alertchip:nth-child(3){animation-delay:.08s}
+.nstack-list .alertchip:nth-child(n+4){animation-delay:.12s}
+@keyframes nslide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes nchip{from{opacity:0;transform:translateY(-6px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media (prefers-reduced-motion:reduce){.nstack.open .nstack-list,.nstack-list .alertchip{animation:none}}
+.nstack-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.nstack:not(.open).multi .nstack-list{display:none}
+.nstack-list.one{margin-top:0}
+.alertchip{display:flex;align-items:center;gap:11px;border-radius:13px;padding:11px 15px;font-size:13px;background:var(--danger-soft);border:1px solid #F0C9C4;color:#8C2C22}
+.alertchip .ic{flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:12px;font-weight:800;background:var(--danger);color:#fff}
+.alertchip .who{font-weight:700}
+.alertchip .txt{font-weight:700;color:var(--danger)}
+.alertchip .when{margin-left:auto;font-size:11.5px;opacity:.7;white-space:nowrap}
+.alertchip .del{border:0;background:transparent;color:currentColor;opacity:.5;cursor:pointer;font-size:17px;line-height:1;padding:0 2px}
+.alertchip .del:hover{opacity:1}
+.detail-alert{margin:10px 12px 0;font-size:12.5px;display:flex;gap:8px;align-items:center}
+.detail-alert .alertdot{margin-left:0}
+.detail-alert .atxt{font-weight:700;color:var(--danger)}
+.detail-alert .ameta{color:var(--muted)}
+
+/* type select pills in alert form */
+.typeseg{display:flex;background:#EDEFF3;border-radius:10px;padding:3px;gap:2px}
+.typeseg button{border:0;background:transparent;cursor:pointer;font:inherit;font-size:12px;font-weight:600;color:var(--muted);padding:7px 12px;border-radius:7px}
+.typeseg button.on{background:#fff;color:var(--navy);box-shadow:var(--shadow-sm)}
+
+/* sticky column header */
+.tablewrap{overflow:visible}
+#supPanel{overflow:visible}
+#supPanel .head{border-radius:var(--radius) var(--radius) 0 0}
+#supTable>thead th{position:sticky;top:118px;z-index:12;background:#FBFCFD}
+.detailwrap thead th{position:static;top:auto;z-index:auto;background:transparent}
+@media (max-width:860px){.tablewrap{overflow-x:auto}#supTable>thead th{position:static}}
+
+/* motion removed — static UI */
+.kpis .kpi{opacity:1}
+
+/* lock gate */
+.lockgate{position:fixed;inset:0;z-index:1000;background:var(--navy);display:flex;align-items:center;justify-content:center;padding:24px}
+.lockcard{background:#fff;border-radius:20px;padding:38px 34px;width:100%;max-width:360px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.lockcard .locklogo{height:26px;margin-bottom:18px}
+.lockcard .lockicon{width:54px;height:54px;border-radius:15px;background:var(--navy-soft);color:var(--navy-2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.lockcard .lockicon svg{width:26px;height:26px}
+.lockcard h2{margin:0 0 6px;font-size:20px;font-weight:680;letter-spacing:-.01em;color:var(--ink)}
+.lockcard p{margin:0 0 20px;font-size:13px;color:var(--muted)}
+.lockcard input[type=password]{width:100%;border:1px solid var(--line-strong);border-radius:11px;padding:12px 14px;font:inherit;font-size:14px;text-align:center}
+.lockcard input[type=password]:focus{outline:none;border-color:var(--navy-2);box-shadow:0 0 0 3px rgba(33,65,111,.14)}
+.lockcard #lockBtn{width:100%;margin-top:12px;background:var(--navy);color:#fff;border:0;border-radius:11px;padding:12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:.16s}
+.lockcard #lockBtn:hover{filter:brightness(1.1)}
+.lockcard #lockBtn:disabled{opacity:.6;cursor:default}
+.lockremember{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;font-size:12px;color:var(--muted);cursor:pointer}
+.lockerr{margin-top:12px;font-size:12.5px;color:var(--danger);min-height:16px;font-weight:600}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* lock screen */
+.lockscreen{position:fixed;inset:0;z-index:200;background:linear-gradient(160deg,#16294D,#0E1B33);display:flex;align-items:center;justify-content:center;padding:24px}
+.lockcard{background:#fff;border-radius:22px;padding:40px 36px;width:100%;max-width:380px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.4);animation:rise .45s cubic-bezier(.2,.7,.2,1)}
+.lockcard .locklogo{height:30px;margin-bottom:24px}
+.lockcard .locklogo{height:34px;width:auto;max-width:200px;object-fit:contain;margin-bottom:20px}
+.lockcard .lockbrand{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.01em;margin-bottom:18px}
+.lockcard .lockbrand{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--navy);margin-bottom:20px}
+.lockcard .lockring{width:60px;height:60px;border-radius:50%;background:var(--navy-soft);color:var(--navy-2);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.lockcard .lockring svg{width:26px;height:26px}
+.lockcard h2{margin:0 0 6px;font-size:21px;font-weight:680;letter-spacing:-.02em;color:var(--ink)}
+.lockcard p{margin:0 0 22px;font-size:13.5px;color:var(--muted);line-height:1.5}
+.lockcard input{width:100%;border:1px solid var(--line-strong);border-radius:12px;padding:13px 15px;font:inherit;font-size:15px;text-align:center;letter-spacing:.04em;color:var(--ink)}
+.lockcard input:focus{outline:none;border-color:var(--navy-2);box-shadow:0 0 0 3px rgba(33,65,111,.14)}
+.lockcard button{width:100%;margin-top:12px;border:0;border-radius:12px;background:var(--navy);color:#fff;font:inherit;font-size:15px;font-weight:600;padding:13px;cursor:pointer;transition:.18s}
+.lockcard button:hover{filter:brightness(1.1)}
+.lockcard .lockerr{min-height:18px;margin-top:12px;font-size:12.5px;color:var(--danger);font-weight:600}
+</style>
+
+<style id="gbtour">
+#gbBackdrop{position:fixed;inset:0;z-index:9998;background:transparent;display:none}
+#gbSpot{position:fixed;z-index:9999;border-radius:12px;box-shadow:0 0 0 9999px rgba(13,22,41,.58);pointer-events:none;display:none;border:2px solid rgba(255,255,255,.85)}
+#gbCard{position:fixed;z-index:10000;width:330px;max-width:calc(100vw - 28px);background:#fff;border-radius:14px;box-shadow:0 24px 60px rgba(10,18,40,.4);padding:16px 17px;display:none}
+#gbCard .gb-step{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A93A3}
+#gbCard h4{margin:5px 0 6px;font-size:16px;font-weight:700;color:#16294D}
+#gbCard p{margin:0;font-size:12.8px;line-height:1.5;color:#5E6A7B}
+#gbCard .gb-row{display:flex;align-items:center;gap:8px;margin-top:14px}
+#gbCard .gb-dots{display:flex;gap:5px;margin-right:auto}
+#gbCard .gb-dot{width:6px;height:6px;border-radius:50%;background:#D7DEEA}
+#gbCard .gb-dot.on{background:#16294D}
+#gbCard button{font:inherit;font-size:12.5px;font-weight:600;border-radius:9px;padding:7px 14px;cursor:pointer;border:1px solid #D9E0EA;background:#fff;color:#5E6A7B}
+#gbCard button.go{background:#16294D;border-color:#16294D;color:#fff}
+#gbCard .gb-skip{position:absolute;top:12px;right:14px;border:0;background:transparent;color:#8A93A3;font-size:12px;padding:2px}
+#gbReplay{position:fixed;right:18px;bottom:18px;z-index:9997;display:inline-flex;align-items:center;gap:7px;background:#16294D;color:#fff;border:0;border-radius:11px;padding:10px 15px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,18,40,.3)}
+#gbBadge{position:fixed;left:18px;bottom:18px;z-index:9997;background:#fff;border:1px solid #E2E7EF;border-radius:10px;padding:7px 13px;font-size:11.5px;font-weight:600;color:#5E6A7B;box-shadow:0 6px 18px rgba(10,18,40,.12)}
+#gbBadge b{color:#16294D}
+@media print{#gbBackdrop,#gbSpot,#gbCard,#gbReplay,#gbBadge{display:none !important}}
 </style>
 </head>
-<body>
-  <div class="topbar">
-    <div class="brand"><b>BabyDoc</b><span>Financial Dashboard</span></div>
-    <div class="asat">As at 30 Jun 2026<b>Updated 11 Jun 2026</b></div>
-  </div>
-  <div class="tabs">
-    <a class="on" href="#">Accounts Payable</a>
-    <a href="#">Balance Sheet <span class="soon">Soon</span></a>
-    <a href="#">Income Statement <span class="soon">Soon</span></a>
-  </div>
-  <div class="ribbon">📘 <b>Guidebook</b> — a practice copy with sample figures. Tap anything; nothing here changes real data.</div>
+<body data-viewer="1">
 
+<div class="topbar">
   <div class="wrap">
-    <div id="remStack" class="nstack" onclick="toggleRem()">
-      <div class="nstack-head"><span class="dot">!</span><span id="remCount">reminders</span><span class="chev">▾</span></div>
-      <div class="nlist" id="nlist"></div>
+    <div class="brand">
+      <span class="fallback">BabyDoc Shop</span>
+      <span class="sep"></span>
+      <span class="ttl">Financial Dashboard</span>
     </div>
+    <div class="spacer"></div>
+    <div class="updated hide-sm">As at <b id="asat">—</b><br>Updated <b id="updated">—</b></div>
+    <button class="btn" id="csvBtn" title="Download the report you're viewing as a CSV for Excel — on Accounts Payable, the aging invoice-by-invoice with each supplier's payments yet to apply">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
+      Download CSV
+    </button>
+    <button class="btn editor-only" id="pwBtn" title="Set the password your two viewers will type to unlock the data">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      Password
+    </button>
+    <button class="btn editor-only" id="shareBtn" title="Download one locked file (index.html) to host or send — contains your data, encrypted, openable only with the password">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+      Export to share
+    </button>
+    <button class="btn editor-only" id="refreshBtn" title="Load a fresh Aged Payables export">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+      Update data
+    </button>
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none">
+    <div class="modeswitch" id="modeswitch">
+      <button id="mEditor" class="on">Editor</button>
+      <button id="mViewer">Viewer</button>
+    </div>
+  </div>
+</div>
 
+<nav class="pagenav">
+  <div class="wrap">
+    <button data-page="ap" class="on">Accounts Payable</button>
+    <button data-page="bs" style="display:none">Balance Sheet <span class="soon">Soon</span></button>
+    <button data-page="is" style="display:none">Income Statement <span class="soon">Soon</span></button>
+  </div>
+</nav>
+
+<div class="wrap">
+  <section id="page-ap" class="page on">
+  <div class="ap-grid">
+  <div class="ap-main">
+  <div id="alertStrip" class="alertstrip"></div>
+  <div class="hero">
+    <p class="eyebrow">Accounts Payable Summary</p>
+    <div class="context" id="contextLine"></div>
     <div class="kpis">
-      <div class="kpi"><div class="lab"><span class="dot" style="background:var(--navy2)"></span>Not yet due</div><div class="val num" id="kOut">—</div><div class="sub" id="kOutSub"></div></div>
-      <div class="kpi"><div class="lab"><span class="dot" style="background:var(--gold)"></span>Overdue</div><div class="val num" id="kOver">—</div><div class="sub" id="kOverSub"></div></div>
-      <div class="kpi net"><div class="lab"><span class="dot" style="background:#8FB0DC"></span>Net payable</div><div class="val num" id="kNet">—</div><div class="sub">overdue + not yet due</div></div>
-    </div>
-
-    <div class="toolbar">
-      <div class="search">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#94A0B2" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="#94A0B2" stroke-width="2"/></svg>
-        <input id="q" type="text" placeholder="Search supplier…" oninput="render()">
+      <div class="kpi">
+        <div class="lab"><span class="dot" style="background:var(--navy-2)"></span>Not yet due</div>
+        <div class="val num" id="kOut">—</div>
+        <div class="sub" id="kOutSub">net of credits</div>
       </div>
-      <div class="seg" id="tierSeg">
-        <button class="on" data-tier="all" onclick="setTier(this)">All payables</button>
-        <button data-tier="key" onclick="setTier(this)">Key</button>
-        <button data-tier="nonkey" onclick="setTier(this)">Non-key</button>
+      <div class="kpi">
+        <div class="lab"><span class="dot" style="background:var(--warn)"></span>Overdue</div>
+        <div class="val num" id="kOver">—</div>
+        <div class="sub" id="kOverSub">past due date</div>
       </div>
-      <div class="seg" id="statSeg">
-        <button class="on" data-stat="all" onclick="setStat(this)">All</button>
-        <button data-stat="overdue" onclick="setStat(this)">Overdue</button>
-        <button data-stat="current" onclick="setStat(this)">Not yet due</button>
+      <div class="kpi accent-net">
+        <div class="lab"><span class="dot" style="background:#8FB0DC"></span>Net payable</div>
+        <div class="val num" id="kNet">—</div>
+        <div class="sub" id="kNetSub">overdue + not yet due</div>
       </div>
     </div>
+    <div class="kpinotes" id="kpiNotes"></div>
+  </div>
 
-    <div class="panel">
-      <div class="panel-h"><h3 id="tblTitle">Suppliers</h3><span class="meta" id="tblMeta"></span></div>
-      <table>
-        <thead id="supHead"><tr>
-          <th data-k="name" onclick="sortBy('name')">Supplier</th>
-          <th data-k="inv" onclick="sortBy('inv')">Invoices</th>
-          <th data-k="nyd" onclick="sortBy('nyd')">Not yet due</th>
-          <th data-k="ov" onclick="sortBy('ov')">Overdue</th>
-          <th data-k="net" onclick="sortBy('net')">Net payable <span class="arr" id="arrNet">▾</span></th>
-          <th data-k="oldest" onclick="sortBy('oldest')">Oldest overdue</th>
-        </tr></thead>
+  <div class="aging cashdue-wrap">
+    <div class="cashhead">
+      <h3>Cash needed</h3>
+      <div class="segmented" id="cashTierSeg">
+        <button data-ct="all" class="on">All payables</button>
+        <button data-ct="key">Key</button>
+        <button data-ct="nonkey">Non-key</button>
+      </div>
+    </div>
+    <div class="cashdue" id="cashDue"></div>
+    <div class="cashdetail" id="cashDetail" style="display:none"></div>
+  </div>
+
+  <div class="controls">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="searchInput" type="text" placeholder="Search supplier…">
+    </div>
+    <div class="segmented tierseg" id="tierSeg">
+      <button data-t="all" class="on">All payables</button>
+      <button data-t="key">Key</button>
+      <button data-t="nonkey">Non-key</button>
+    </div>
+    <div class="segmented" id="viewSeg">
+      <button data-v="all" class="on">All</button>
+      <button data-v="overdue">Overdue</button>
+      <button data-v="current">Not yet due</button>
+    </div>
+    <button class="btn attnbtn" id="attnBtn" title="Show only suppliers with a note or a reminder">Review <span id="attnCount"></span></button>
+    <button class="btn clearsel" id="clearBtn" style="display:none">Clear selection</button>
+  </div>
+
+  <div class="notice editor-only" id="classNotice" style="display:none"></div>
+
+  <div class="panel" id="supPanel">
+    <div class="head">
+      <h3 id="tblTitle">Suppliers</h3>
+      <div class="meta" id="tblMeta">—</div>
+    </div>
+    <div class="tablewrap">
+      <table id="supTable">
+        <thead>
+          <tr>
+            <th data-k="supplier">Supplier <span class="arr"></span></th>
+            <th data-k="invoices">Invoices <span class="arr"></span></th>
+            <th data-k="currentNet">Not yet due <span class="arr"></span></th>
+            <th data-k="overdueNet">Overdue <span class="arr"></span></th>
+            <th data-k="net">Net payable <span class="arr">▾</span></th>
+            <th data-k="oldest" class="oldcol">Oldest overdue <span class="arr"></span></th>
+          </tr>
+        </thead>
         <tbody id="supBody"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- tour -->
-  <div id="backdrop"></div>
-  <div id="hi"></div>
-  <div id="card">
-    <button class="x" onclick="endTour()" aria-label="Close">×</button>
-    <div class="step" id="cStep"></div>
-    <h4 id="cTitle"></h4>
-    <p id="cBody"></p>
-    <div class="row">
-      <div class="dots" id="cDots"></div>
-      <button class="ghost" id="cBack" onclick="tour(-1)">Back</button>
-      <button class="go" id="cNext" onclick="tour(1)">Next</button>
+  <div class="panel apply-panel editor-only">
+    <div class="head">
+      <h3>Payments to apply <span class="applybadge">unallocated settlements</span></h3>
+      <div class="meta">Money already paid to a supplier, awaiting allocation to an invoice</div>
     </div>
+    <div class="applyform">
+      <div class="fld">
+        <label for="apSup">Supplier</label>
+        <select id="apSup"></select>
+      </div>
+      <div class="fld">
+        <label for="apAmt">Amount (€)</label>
+        <input id="apAmt" class="amt" type="number" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="fld">
+        <label for="apDate">Date paid</label>
+        <input id="apDate" type="date">
+      </div>
+      <div class="fld">
+        <label for="apNote">Note (optional)</label>
+        <input id="apNote" class="note" type="text" placeholder="e.g. bank ref / awaiting remittance">
+      </div>
+      <button class="addbtn" id="apAdd">Add payment</button>
+    </div>
+    <div class="applylist" id="applyList"></div>
   </div>
-  <button id="replay" onclick="startTour()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.3 5.6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M4 20v-5h5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Replay tour</button>
 
+  <div class="panel apply-panel editor-only">
+    <div class="head">
+      <h3>Reminders <span class="applybadge">shown to viewers</span></h3>
+      <div class="meta">Whatever you type shows in bold red at the top of the page and as a red dot on the supplier — e.g. chasing, dispute, stop-supply, paying on the 25th</div>
+    </div>
+    <div class="applyform">
+      <div class="fld">
+        <label for="alSup">Supplier</label>
+        <select id="alSup"></select>
+      </div>
+      <div class="fld" style="flex:1;min-width:220px">
+        <label for="alText">Message</label>
+        <input id="alText" type="text" style="width:100%" placeholder="e.g. final reminder before stop-supply">
+      </div>
+      <div class="fld">
+        <label for="alAmt">Amount (€, optional)</label>
+        <input id="alAmt" class="amt" type="number" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="fld">
+        <label for="alDate">Date (optional)</label>
+        <input id="alDate" type="date">
+      </div>
+      <button class="addbtn" id="alAdd">Add reminder</button>
+    </div>
+    <div class="applylist" id="alertEditList"></div>
+  </div>
+
+  <div class="panel apply-panel editor-only">
+    <div class="head">
+      <h3>Supplier notes <span class="applybadge">shown to viewers</span></h3>
+      <div class="meta">Quiet background note per supplier — appears on hover over the supplier and pinned inside its detail. One note per supplier (saving again replaces it)</div>
+    </div>
+    <div class="applyform">
+      <div class="fld">
+        <label for="ntSup">Supplier</label>
+        <select id="ntSup"></select>
+      </div>
+      <div class="fld" style="flex:1;min-width:240px">
+        <label for="ntText">Note</label>
+        <input id="ntText" type="text" style="width:100%" placeholder="e.g. price renegotiated from June / VAT query open">
+      </div>
+      <button class="addbtn" id="ntAdd">Save note</button>
+    </div>
+    <div class="applylist" id="noteEditList"></div>
+  </div>
+
+  <div class="footnote">
+    Built for BabyDoc Shop · figures in EUR · source: Aged Payables Detail.
+    <span class="editor-only">Editor view — your inputs save to this browser. <a href="#" id="setPw">Set/Reset viewer password</a> · <a href="#" id="resetAll">Reset payments</a></span>
+  </div>
+  </div><!-- /ap-main -->
+  <aside class="ap-side">
+    <h3 class="side-h">Top 5 key payables</h3>
+    <div id="top5"></div>
+  </aside>
+  </div><!-- /ap-grid -->
+  </section>
+
+  <section id="page-bs" class="page">
+    <div class="coming">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></div>
+      <span class="badge">Coming soon</span>
+      <h2>Balance Sheet</h2>
+      <p>Assets, liabilities and equity at a glance. This page is being built and will plug into the same data flow as your payables view.</p>
+    </div>
+  </section>
+
+  <section id="page-is" class="page">
+    <div class="coming">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 3-4 3 3 4-6"/></svg></div>
+      <span class="badge">Coming soon</span>
+      <h2>Income Statement</h2>
+      <p>Revenue, cost of sales and profit over time. This page is being built and will sit alongside your payables and balance sheet views.</p>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="lockscreen" id="lock" style="display:none">
+  <div class="lockcard">
+    <div class="lockbrand">BabyDoc Shop</div>
+    <div class="lockring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+    <h2>Financial Dashboard</h2>
+    <p>This dashboard is private. Enter the password to view it.</p>
+    <input id="lockPw" type="password" placeholder="Password" autocomplete="off">
+    <button id="lockBtn">Unlock</button>
+    <div class="lockerr" id="lockErr"></div>
+  </div>
+</div>
+
+<script id="apdata" type="application/json">{"asAt": "2026-06-30", "rows": [{"supplier": "Willow & Pine Furniture", "invoiceDate": "2026-04-01", "dueDate": "2026-05-01", "ref": "WP-3381", "current": 0, "overdue": 5000.02, "total": 5000.02, "daysOverdue": 60}, {"supplier": "Willow & Pine Furniture", "invoiceDate": "2026-06-10", "dueDate": "2026-07-20", "ref": "WP-3502", "current": 6000.0, "overdue": 0, "total": 6000.0, "daysOverdue": 0}, {"supplier": "Willow & Pine Furniture", "invoiceDate": "2026-06-12", "dueDate": "2026-08-15", "ref": "WP-3540", "current": 5266.25, "overdue": 0, "total": 5266.25, "daysOverdue": 0}, {"supplier": "Nordic Cradles Ltd", "invoiceDate": "2026-03-11", "dueDate": "2026-04-10", "ref": "NC-90114", "current": 0, "overdue": 18250.0, "total": 18250.0, "daysOverdue": 81}, {"supplier": "Nordic Cradles Ltd", "invoiceDate": "2026-04-20", "dueDate": "2026-05-20", "ref": "NC-90233", "current": 0, "overdue": 4150.4, "total": 4150.4, "daysOverdue": 41}, {"supplier": "Tiny Steps Strollers", "invoiceDate": "2026-04-25", "dueDate": "2026-05-25", "ref": "TS-1187", "current": 0, "overdue": 8120.0, "total": 8120.0, "daysOverdue": 36}, {"supplier": "Brightleaf Toys", "invoiceDate": "2026-05-11", "dueDate": "2026-06-10", "ref": "BL-4421", "current": 0, "overdue": 2480.5, "total": 2480.5, "daysOverdue": 20}, {"supplier": "Harbour Logistics", "invoiceDate": "2026-05-02", "dueDate": "2026-06-01", "ref": "HL-77310", "current": 0, "overdue": 3360.0, "total": 3360.0, "daysOverdue": 29}, {"supplier": "Cloudtop Telecom", "invoiceDate": "2026-05-10", "dueDate": "2026-06-09", "ref": "CT-5521", "current": 0, "overdue": 142.8, "total": 142.8, "daysOverdue": 21}, {"supplier": "Meadow Linens", "invoiceDate": "2026-06-04", "dueDate": "2026-07-04", "ref": "ML-2098", "current": 1549.0, "overdue": 0, "total": 1549.0, "daysOverdue": 0}, {"supplier": "Meadow Linens", "invoiceDate": "2026-06-18", "dueDate": "2026-07-18", "ref": "ML-2126", "current": 2360.0, "overdue": 0, "total": 2360.0, "daysOverdue": 0}, {"supplier": "Sunbeam Imports", "invoiceDate": "2026-06-08", "dueDate": "2026-06-08", "ref": "SB-CR014", "current": 0, "overdue": -1240.0, "total": -1240.0, "daysOverdue": 22}, {"supplier": "Acorn Stationery", "invoiceDate": "2026-05-21", "dueDate": "2026-06-20", "ref": "AS-3004", "current": 0, "overdue": 0.9, "total": 0.9, "daysOverdue": 10}, {"supplier": "Civic Rates Office", "invoiceDate": "2026-01-29", "dueDate": "2026-12-31", "ref": "CR-820551", "current": 4200.0, "overdue": 0, "total": 4200.0, "daysOverdue": 0}], "updatedAt": 1781000000000}</script>
+<script id="apunapplied" type="application/json">[{"id": "s1", "supplier": "Willow & Pine Furniture", "amount": 12745.68, "date": "2026-06-12", "note": "bank transfer 12 Jun"}]</script>
+<script id="apclass" type="application/json">{"willow & pine furniture": "key", "nordic cradles ltd": "key", "tiny steps strollers": "key", "brightleaf toys": "key", "meadow linens": "key", "sunbeam imports": "key", "civic rates office": "key", "harbour logistics": "nonkey", "cloudtop telecom": "nonkey", "acorn stationery": "nonkey"}</script>
+<script id="apclassoverrides" type="application/json">{}</script>
+<script id="apalerts" type="application/json">[{"id": "a1", "supplier": "Tiny Steps Strollers", "text": "Final reminder before stop-supply", "amount": 8120, "date": "2026-06-20"}]</script>
+<script id="apnotes" type="application/json">{"Brightleaf Toys": "Price renegotiated from July \u2014 confirm credit note."}</script>
+<script id="apenc" type="application/json">null</script>
 <script>
-const fmt0 = n => new Intl.NumberFormat('en-IE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
-const fmt2 = n => new Intl.NumberFormat('en-IE',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(n);
+/* ============ data ============ */
+const VIEWER_ONLY = document.body.dataset.viewer==='1';
+const EMBEDDED = JSON.parse(document.getElementById('apdata').textContent);
+let CLASSMAP = JSON.parse(document.getElementById('apclass').textContent);
+let classOverrides = loadOverrides();
+let alerts = loadAlerts();
+let DATA = loadData();
+let unapplied = loadUnapplied();
+let notes = loadNotes();
+const ui = { selected:null, view:'all', tier:'all', mode:'editor', search:'', sort:{key:'net',dir:-1} };
 
-const SUP = [
-  {name:"Columbus Trading Partners",inv:39,nyd:1593,ov:25822,oldest:61,tier:"key",
-   note:"Price renegotiated from June",
-   reminder:"Final reminder before stop-supply — clear the two oldest invoices",
-   apply:20485, paid:"08 Jun 2026",
-   invoices:[
-     {ref:"INV-94334664",due:"19 Jun 2026",status:"19 d overdue",od:true,amt:13925.38},
-     {ref:"INV-94317327",due:"12 Jun 2026",status:"26 d overdue",od:true,amt:9304.78},
-     {ref:"INV-94378928",due:"01 Jul 2026",status:"not due",od:false,amt:1593.00}]},
-  {name:"Gleasure",inv:1,nyd:0,ov:17071,oldest:66,tier:"key",reminder:"Chasing payment — phoned twice this week"},
-  {name:"Bugaboo",inv:12,nyd:8200,ov:14600,oldest:47,tier:"key",reminder:"Promised a payment plan — confirm by Friday"},
-  {name:"iCandy",inv:6,nyd:12000,ov:9000,oldest:38,tier:"key"},
-  {name:"David Lowe",inv:5,nyd:9300,ov:6000,oldest:29,tier:"nonkey"},
-  {name:"Mamas & Papas",inv:9,nyd:14500,ov:3200,oldest:18,tier:"key",note:"Awaiting a credit note for returned stock"},
-  {name:"Shnuggle",inv:4,nyd:5400,ov:1900,oldest:12,tier:"nonkey"},
-  {name:"Obaby",inv:0,nyd:-4668,ov:0,oldest:0,tier:"nonkey",credit:true,note:"We've overpaid — credit to use against the next order"},
+function loadOverrides(){
+  if(VIEWER_ONLY){ try{ return JSON.parse(document.getElementById('apclassoverrides').textContent)||{}; }catch(e){ return {}; } }
+  try{ const s=localStorage.getItem('bd_ap_class'); if(s) return JSON.parse(s);}catch(e){} return {};
+}
+function persistOverrides(){ if(VIEWER_ONLY) return; try{ localStorage.setItem('bd_ap_class', JSON.stringify(classOverrides)); }catch(e){} }
+function loadAlerts(){
+  if(VIEWER_ONLY){ try{ return JSON.parse(document.getElementById('apalerts').textContent)||[]; }catch(e){ return []; } }
+  try{ const s=localStorage.getItem('bd_ap_alerts'); if(s) return JSON.parse(s);}catch(e){} return [];
+}
+function persistAlerts(){ if(VIEWER_ONLY) return; try{ localStorage.setItem('bd_ap_alerts', JSON.stringify(alerts)); }catch(e){} }
+function loadNotes(){
+  if(VIEWER_ONLY){ try{ return JSON.parse(document.getElementById('apnotes').textContent)||{}; }catch(e){ return {}; } }
+  try{ const s=localStorage.getItem('bd_ap_notes'); if(s) return JSON.parse(s);}catch(e){} return {};
+}
+function persistNotes(){ if(VIEWER_ONLY) return; try{ localStorage.setItem('bd_ap_notes', JSON.stringify(notes)); }catch(e){} }
+function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ---- privacy helpers live below in a single block ---- */
+function supplierAlertBadge(sup){
+  const a=alerts.filter(x=>x.supplier===sup);
+  if(!a.length) return '';
+  return '<span class="alertdot" title="'+esc(a[a.length-1].text||'Flagged')+'">!</span>';
+}
+function noteBadge(sup){
+  const t=notes[sup];
+  if(!t) return '';
+  return '<span class="notebadge">✎<span class="tip">'+esc(t)+'</span></span>';
+}
+
+/* ---- privacy: client-side encryption (built-in Web Crypto, no libraries) ---- */
+const _enc=new TextEncoder(), _dec=new TextDecoder();
+const _b64=u=>btoa(String.fromCharCode.apply(null,u));
+const _ub64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function deriveKey(pw,salt,iters){
+  const base=await crypto.subtle.importKey('raw',_enc.encode(pw),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:iters||600000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function encryptPayload(obj,pw){
+  const iters=600000;
+  const salt=crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveKey(pw,salt,iters);
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,_enc.encode(JSON.stringify(obj))));
+  return {v:1,enc:true,iters:iters,salt:_b64(salt),iv:_b64(iv),ct:_b64(ct)};
+}
+async function decryptPayload(blob,pw){
+  const key=await deriveKey(pw,_ub64(blob.salt),blob.iters);
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:_ub64(blob.iv)},key,_ub64(blob.ct));
+  return JSON.parse(_dec.decode(pt));
+}
+function getPublishPw(){ try{ return localStorage.getItem('bd_pub_pw')||''; }catch(e){ return ''; } }
+function ensurePublishPw(){
+  let pw=getPublishPw();
+  if(pw) return pw;
+  pw=window.prompt('Set a password for your private dashboard.\n\nYour two viewers will type this to open the link. Use a strong one and share it with them separately from the link.');
+  if(pw && pw.length>=6){ try{ localStorage.setItem('bd_pub_pw',pw); }catch(e){} return pw; }
+  if(pw!==null) toast('Password must be at least 6 characters');
+  return '';
+}
+const normName = s => (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
+function supClass(sup){ const n=normName(sup); return classOverrides[n] || CLASSMAP[n] || 'unclassified'; }
+function setClass(sup,tier){ classOverrides[normName(sup)]=tier; persistOverrides(); renderAll(); toast(sup+' marked '+(tier==='key'?'Key':'Non-key')); }
+
+function loadData(){
+  if(VIEWER_ONLY) return JSON.parse(JSON.stringify(EMBEDDED));
+  try{ const s=localStorage.getItem('bd_ap_data'); if(s) return JSON.parse(s); }catch(e){}
+  return JSON.parse(JSON.stringify(EMBEDDED));
+}
+function persistData(){ if(VIEWER_ONLY) return; try{ localStorage.setItem('bd_ap_data', JSON.stringify(DATA)); }catch(e){} }
+function loadUnapplied(){
+  if(VIEWER_ONLY){ try{ return JSON.parse(document.getElementById('apunapplied').textContent)||[]; }catch(e){ return []; } }
+  try{ const s=localStorage.getItem('bd_ap_unapplied'); if(s) return JSON.parse(s);}catch(e){} return [];
+}
+function persistUnapplied(){ if(VIEWER_ONLY) return; try{ localStorage.setItem('bd_ap_unapplied', JSON.stringify(unapplied)); }catch(e){} }
+
+/* ============ helpers ============ */
+const eur = n => '€'+(Math.round(n*100)/100).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2});
+const eur0 = n => '€'+Math.round(n).toLocaleString('en-IE');
+function fmtDate(iso){ if(!iso) return '—'; const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('en-IE',{day:'2-digit',month:'short',yyyy:'numeric',year:'numeric'}); }
+function fmtUpdated(ts){ const d=new Date(ts); return d.toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'})+', '+d.toLocaleTimeString('en-IE',{hour:'2-digit',minute:'2-digit'}); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2400); }
+
+const BUCKETS = [
+  {key:'current', label:'Not yet due', color:'var(--good)'},
+  {key:'b1',      label:'< 1 month',   color:'#7FA8D8'},
+  {key:'b2',      label:'1 month',     color:'#E0B255'},
+  {key:'b3',      label:'2 months',    color:'#D9913C'},
+  {key:'b4',      label:'3 months',    color:'#C7662F'},
+  {key:'older',   label:'Older',       color:'#B23A2E'},
 ];
-SUP.forEach(s=>s.net = s.nyd + s.ov);
 
-const ui = {tier:"all", stat:"all", sort:{k:"net",dir:-1}, open:null};
-
-function toggleRem(){ document.getElementById('remStack').classList.toggle('open'); }
-function setTier(b){ document.querySelectorAll('#tierSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); ui.tier=b.dataset.tier; render(); }
-function setStat(b){ document.querySelectorAll('#statSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); ui.stat=b.dataset.stat; render(); }
-function sortBy(k){
-  if(ui.sort.k===k) ui.sort.dir*=-1; else ui.sort={k,dir:(k==='name'?1:-1)};
-  document.querySelectorAll('thead th .arr').forEach(a=>a.remove());
-  const th=document.querySelector('thead th[data-k="'+k+'"]');
-  th.insertAdjacentHTML('beforeend',' <span class="arr">'+(ui.sort.dir<0?'▾':'▴')+'</span>');
-  render();
-}
-
-function reminders(){ return SUP.filter(s=>s.reminder); }
-
-function renderReminders(){
-  const r=reminders();
-  document.getElementById('remCount').textContent = r.length+' reminder'+(r.length===1?'':'s')+' · tap to open';
-  document.getElementById('nlist').innerHTML = r.map(s=>
-    '<div class="nrow"><span class="who">'+s.name+'</span><span class="msg">'+s.reminder+'</span></div>').join('');
-}
-
-function renderKPIs(rows){
-  const nyd=rows.reduce((a,s)=>a+s.nyd,0), ov=rows.reduce((a,s)=>a+s.ov,0), net=rows.reduce((a,s)=>a+s.net,0);
-  document.getElementById('kOut').textContent=fmt0(nyd);
-  document.getElementById('kOver').textContent=fmt0(ov);
-  document.getElementById('kNet').textContent=fmt0(net);
-  document.getElementById('kOutSub').textContent=rows.length+' suppliers';
-  document.getElementById('kOverSub').textContent=(net>0?Math.round(ov/net*100):0)+'% of net payable';
-}
-
-function amtCell(v){
-  if(Math.abs(v)<0.5) return '<span class="zero">—</span>';
-  return v<0 ? '<span class="neg num">'+fmt0(v)+'</span>' : '<span class="num">'+fmt0(v)+'</span>';
-}
-
-function detailHTML(s,idx){
-  let h='<div class="detail" id="detail-'+idx+'">';
-  if(s.note) h+='<div class="detail-note">✎ '+s.note+'</div>';
-  if(s.invoices){
-    h+='<table class="dettbl"><thead><tr><th>Invoice</th><th>Due date</th><th>Status</th><th>Amount</th></tr></thead><tbody>';
-    s.invoices.forEach(i=>{ h+='<tr><td>'+i.ref+'</td><td>'+i.due+'</td><td><span class="st '+(i.od?'od':'ok')+'">'+i.status+'</span></td><td class="num">'+fmt2(i.amt)+'</td></tr>'; });
-    h+='</tbody></table>';
-  } else {
-    h+='<div class="detail-note" style="background:#fff;border:1px dashed var(--line)">In the live dashboard, every invoice for this supplier is listed here with its due date and status.</div>';
-  }
-  if(s.reminder) h+='<div class="detail-alert">! '+s.reminder+'</div>';
-  if(s.apply) h+='<div class="alloc">'+fmt0(s.apply)+' paid on '+s.paid+', not yet allocated — applied to the oldest invoices first. Net payable <b>'+fmt0(s.net)+'</b>.</div>';
-  else if(s.credit) h+='<div class="alloc">This supplier is <b>in credit</b> '+fmt0(-s.net)+' — we can set it against the next invoice.</div>';
-  h+='</div>';
-  return h;
-}
-
-function render(){
-  const q=(document.getElementById('q').value||'').toLowerCase().trim();
-  let rows=SUP.filter(s=>{
-    if(ui.tier!=='all' && s.tier!==ui.tier) return false;
-    if(ui.stat==='overdue' && s.ov<=0) return false;
-    if(ui.stat==='current' && s.nyd<=0) return false;
-    if(q && !s.name.toLowerCase().includes(q)) return false;
+/* rows passing current view filter (overdue/current/all), ignoring supplier selection */
+function viewRows(){
+  return DATA.rows.filter(r=>{
+    if(ui.tier!=='all' && supClass(r.supplier)!==ui.tier) return false;
+    if(ui.view==='overdue') return r.overdue!==0;
+    if(ui.view==='current') return r.current!==0;
     return true;
   });
-  renderKPIs(rows);
-  const k=ui.sort.k, dir=ui.sort.dir;
-  rows=[...rows].sort((a,b)=> k==='name' ? a.name.localeCompare(b.name)*dir : (a[k]-b[k])*dir );
+}
+function cashRows(){
+  return DATA.rows.filter(r=> !ui.cashTier || ui.cashTier==='all' || supClass(r.supplier)===ui.cashTier);
+}
+function applyForSupplier(sup){ return unapplied.filter(u=>u.supplier===sup).reduce((a,u)=>a+(+u.amount||0),0); }
 
-  const tier = ui.tier==='key'?'Key ':ui.tier==='nonkey'?'Non-key ':'';
-  document.getElementById('tblTitle').textContent = tier+'Suppliers'+(ui.stat==='overdue'?' · overdue':ui.stat==='current'?' · not yet due':'');
-  document.getElementById('tblMeta').textContent = rows.length+' suppliers · net '+fmt0(rows.reduce((a,s)=>a+s.net,0));
+/* aggregate suppliers from a row set */
+function aggregate(rows){
+  const m=new Map();
+  rows.forEach(r=>{
+    if(!m.has(r.supplier)) m.set(r.supplier,{supplier:r.supplier,invoices:0,grossTotal:0,grossOverdue:0,grossCurrent:0,oldest:0,tinyCount:0});
+    const o=m.get(r.supplier);
+    o.invoices++; o.grossTotal+=r.total; o.grossOverdue+=r.overdue; o.grossCurrent+=r.current;
+    if(r.overdue!==0 && r.daysOverdue>o.oldest) o.oldest=r.daysOverdue;
+    if(Math.abs(r.total)>0 && Math.abs(r.total)<2) o.tinyCount++;
+  });
+  const arr=[...m.values()].map(o=>{
+    const A=applyForSupplier(o.supplier);            // unallocated credit to apply (>=0)
+    o.apply=A;
+    o.net=o.grossTotal-A;                             // ledger net = total due − paid (matches aging)
+    // payment clears OVERDUE first (down to zero, never negative), remainder reduces NOT-YET-DUE
+    const od = Math.max(o.grossOverdue, 0);
+    o.overdueNet = o.grossOverdue - Math.min(A, od);
+    o.currentNet = o.grossCurrent - Math.max(0, A - od);
+    o.inCredit = o.net < -0.005;
+    o.needsAttention = alerts.some(x=>x.supplier===o.supplier) || !!notes[o.supplier];
+    return o;
+  });
+  return arr;
+}
 
+/* ============ KPIs ============ */
+function setKpi(id, to){ const el=document.getElementById(id); if(el){ el.textContent=eur0(to); el._v=to; } }
+let cashBreak=[];   // per-bucket {label, rows:[{supplier,amount}]}
+function renderTop5(){
+  // Key suppliers only, ranked by net payable; Overdue / Not-yet-due / Net are all net of payments to apply
+  const top = aggregate(DATA.rows).filter(d=>d.net>0.005 && supClass(d.supplier)==='key').sort((a,b)=>b.net-a.net).slice(0,5);
+  const el=document.getElementById('top5'); if(!el) return;
+  el.innerHTML = top.length ? top.map(d=>
+    '<div class="top5card">'+
+      '<div class="t5-name" title="'+esc(d.supplier)+'">'+esc(d.supplier)+'</div>'+
+      '<div class="t5-row">'+
+        '<div class="t5-cell"><div class="t5-lab">Overdue</div><div class="t5-val'+(d.overdueNet<-0.005?' neg':'')+'">'+eur0(d.overdueNet)+'</div></div>'+
+        '<div class="t5-cell"><div class="t5-lab">Not yet due</div><div class="t5-val">'+eur0(d.currentNet)+'</div></div>'+
+      '</div>'+
+      '<div class="t5-net">Net payable '+eur0(d.net)+'</div>'+
+    '</div>').join('') : '<div class="t5-net" style="border:0">No key suppliers yet.</div>';
+}
+function renderCashDue(){
+  const asAt = new Date((DATA.asAt||new Date().toISOString().slice(0,10))+'T00:00:00');
+  const buckets=[
+    {lab:'Overdue (now)', cls:'cd-now'},
+    {lab:'Due ≤ 7 days', cls:'cd-7',  lo:0,  hi:7},
+    {lab:'Due 8–30 days',cls:'cd-30', lo:8,  hi:30},
+    {lab:'Due 31–90 days',cls:'cd-90',lo:31, hi:90},
+    {lab:'Due 90+ days', cls:'cd-far',lo:91, hi:1e9},
+  ];
+  const sums=buckets.map(()=>0);
+  const maps=buckets.map(()=>({}));
+  const rows=cashRows();
+  const agg=aggregate(rows);
+  // "Overdue (now)" = the Overdue figure for this filter (net of payments, floored at zero), per supplier
+  agg.forEach(d=>{
+    if(Math.abs(d.overdueNet)>0.005){ sums[0]+=d.overdueNet; maps[0][d.supplier]=(maps[0][d.supplier]||0)+d.overdueNet; }
+  });
+  // leftover payment after clearing each supplier's overdue then reduces NOT-YET-DUE, oldest due first
+  const leftover={}; agg.forEach(d=>{ leftover[d.supplier]=Math.max(0,(d.apply||0)-Math.max(d.grossOverdue,0)); });
+  const bySup={};
+  rows.forEach(r=>{ if(r.current>0 && r.dueDate){ (bySup[r.supplier]=bySup[r.supplier]||[]).push(r); } });
+  Object.keys(bySup).forEach(sup=>{
+    let rem=leftover[sup]||0;
+    bySup[sup].sort((a,b)=>(a.dueDate||'').localeCompare(b.dueDate||'')).forEach(r=>{
+      let amt=r.current; const take=Math.min(rem,amt); amt-=take; rem-=take;
+      if(amt>0.005){
+        const days=Math.round((new Date(r.dueDate+'T00:00:00')-asAt)/86400000);
+        for(let i=1;i<buckets.length;i++){ if(days>=buckets[i].lo && days<=buckets[i].hi){ sums[i]+=amt; maps[i][sup]=(maps[i][sup]||0)+amt; break; } }
+      }
+    });
+  });
+  cashBreak = buckets.map((b,i)=>({ label:b.lab,
+    rows:Object.entries(maps[i]).map(([supplier,amount])=>({supplier,amount}))
+          .filter(x=>Math.abs(x.amount)>0.005).sort((a,b)=>Math.abs(b.amount)-Math.abs(a.amount)) }));
+  document.getElementById('cashDue').innerHTML = buckets.map((b,i)=>
+    '<div class="cd '+b.cls+(ui.cashOpen===i?' open':'')+'" data-cb="'+i+'" role="button" tabindex="0">'+
+      '<div class="cd-lab">'+b.lab+'<span class="cd-chev">▸</span></div>'+
+      '<div class="cd-val num">'+eur0(sums[i])+'</div>'+
+      '<div class="cd-cnt">'+cashBreak[i].rows.length+' supplier'+(cashBreak[i].rows.length===1?'':'s')+'</div>'+
+    '</div>').join('');
+  renderCashDetail();
+}
+function renderCashDetail(){
+  const el=document.getElementById('cashDetail'); const i=ui.cashOpen;
+  if(i==null || !cashBreak[i] || !cashBreak[i].rows.length){ el.style.display='none'; el.innerHTML=''; return; }
+  const b=cashBreak[i];
+  el.style.display='block';
+  el.innerHTML='<div class="cdd-h">'+b.label+' · '+b.rows.length+' supplier'+(b.rows.length===1?'':'s')+
+      '<button class="cdd-x" title="Close">×</button></div>'+
+    '<div class="cdd-list">'+b.rows.map(r=>
+      '<div class="cdd-row"><span class="cdd-s">'+esc(r.supplier)+'</span><span class="'+(r.amount<0?'neg ':'')+'num">'+eur(r.amount)+'</span></div>').join('')+'</div>';
+  el.querySelector('.cdd-x').onclick=()=>{ ui.cashOpen=null; renderCashDue(); };
+}
+function renderKPIs(){
+  let rows = viewRows();
+  if(ui.selected) rows = rows.filter(r=>r.supplier===ui.selected);
+  let agg = aggregate(rows);
+  if(ui.selected) agg = agg.filter(a=>a.supplier===ui.selected);
+  const over = agg.reduce((a,d)=>a+d.overdueNet,0);   // net overdue
+  const cur  = agg.reduce((a,d)=>a+d.currentNet,0);    // net not-yet-due
+  const net  = agg.reduce((a,d)=>a+d.net,0);           // = total due − payments to apply (ties to aging)
+  const sups = new Set(rows.map(r=>r.supplier));
+  setKpi('kOut', cur); setKpi('kOver', over); setKpi('kNet', net);
+  const pct = net>0 ? Math.round(over/net*100) : 0;
+  document.getElementById('kOverSub').textContent = pct+'% of net payable';
+  document.getElementById('kOutSub').textContent = sups.size+' supplier'+(sups.size===1?'':'s')+' · '+rows.length+' invoices';
+  document.getElementById('kNetSub').textContent = 'overdue + not yet due';
+  document.getElementById('contextLine').innerHTML = ui.selected ? ('Viewing <b>'+ui.selected+'</b>') : '';
+
+  // reconciliation + concentration notes (whole current view, not the single selection)
+  const va = aggregate(viewRows());
+  const totalDue = va.reduce((a,d)=>a+d.grossTotal,0);
+  const pay = va.reduce((a,d)=>a+d.apply,0);
+  let notes='';
+  if(pay>0.005) notes += '<span class="recon">Total due <b>'+eur0(totalDue)+'</b> &minus; payment allocation in progress <b>'+eur0(pay)+'</b> = Net payable <b>'+eur0(totalDue-pay)+'</b></span>';
+  document.getElementById('kpiNotes').innerHTML = notes;
+}
+
+/* ============ aging strip ============ */
+function renderAging(){
+  let rows = viewRows();
+  if(ui.selected) rows = rows.filter(r=>r.supplier===ui.selected);
+  // build buckets from raw spread: current + the 5 overdue bands collapsed into our labels
+  // we only stored current/overdue/total per row, so approximate bands by daysOverdue
+  const b = {current:0,b1:0,b2:0,b3:0,b4:0,older:0};
+  rows.forEach(r=>{
+    b.current += Math.max(r.current,0);
+    if(r.overdue>0){
+      const d=r.daysOverdue;
+      if(d<=30) b.b1+=r.overdue; else if(d<=60) b.b2+=r.overdue;
+      else if(d<=90) b.b3+=r.overdue; else if(d<=120) b.b4+=r.overdue; else b.older+=r.overdue;
+    }
+  });
+  const total = Object.values(b).reduce((a,x)=>a+x,0) || 1;
+  const bar=document.getElementById('ageBar'); bar.innerHTML='';
+  const leg=document.getElementById('ageLegend'); leg.innerHTML='';
+  BUCKETS.forEach(bk=>{
+    const v=b[bk.key]; const w=v/total*100;
+    if(w>0){ const seg=document.createElement('div'); seg.style.width=w+'%'; seg.style.background=bk.color; seg.title=bk.label+' '+eur(v); bar.appendChild(seg); }
+    const it=document.createElement('div'); it.className='it';
+    it.innerHTML='<span class="sw" style="background:'+bk.color+'"></span>'+bk.label+' <span class="am num">'+eur0(v)+'</span>';
+    leg.appendChild(it);
+  });
+  document.getElementById('agingScope').textContent = ui.selected ? ui.selected : 'all suppliers';
+}
+
+/* ============ supplier table ============ */
+function renderTable(){
+  let data = aggregate(viewRows());
+  const attnTotal = data.filter(d=>d.needsAttention).length;
+  document.getElementById('attnCount').textContent = attnTotal? '('+attnTotal+')' : '';
+  document.getElementById('attnBtn').classList.toggle('on', !!ui.attention);
+  if(ui.attention) data = data.filter(d=>d.needsAttention);
+  if(ui.search){ const q=ui.search.toLowerCase(); data=data.filter(d=>d.supplier.toLowerCase().includes(q)); }
+  const k=ui.sort.key, dir=ui.sort.dir;
+  data.sort((a,b)=>{
+    let va,vb;
+    if(k==='supplier'){ va=a.supplier.toLowerCase(); vb=b.supplier.toLowerCase(); return va<vb?-dir:va>vb?dir:0; }
+    va=a[k]; vb=b[k]; return (va-vb)*dir;
+  });
   const body=document.getElementById('supBody'); body.innerHTML='';
-  rows.forEach(s=>{
-    const idx=SUP.indexOf(s);
-    const open = ui.open===idx;
-    const tr=document.createElement('tr'); tr.className='sup'+(open?' open':'');
-    tr.onclick=()=>{ ui.open = open?null:idx; render(); };
-    const oldPill = s.oldest>0 ? '<span class="pill '+(s.oldest>90?'danger':'warn')+'">'+s.oldest+' d</span>' : '<span class="pill ok">current</span>';
-    const flag = s.reminder ? '<span class="flag">!</span>' : '';
-    const note = s.note ? '<span class="noteico" title="'+s.note.replace(/"/g,'')+'">✎</span>' : '';
-    const credit = s.net<0 ? ' <span class="pill ok">in credit '+fmt0(-s.net)+'</span>' : '';
-    const netCell = s.net<0 ? '<span class="neg num">'+fmt0(s.net)+'</span>' : (Math.abs(s.net)<0.5?'<span class="zero">—</span>':'<span class="net-v num">'+fmt0(s.net)+'</span>');
+  const grandNet=data.reduce((a,d)=>a+d.net,0);
+  const tierWord = ui.tier==='key'?'Key ':ui.tier==='nonkey'?'Non-key ':ui.tier==='unclassified'?'Unclassified ':'All ';
+  const statusWord = ui.view==='overdue'?' · overdue':ui.view==='current'?' · not yet due':'';
+  document.getElementById('tblTitle').textContent = tierWord+'Suppliers'+statusWord;
+  document.getElementById('tblMeta').textContent = data.length+' suppliers · net '+eur0(grandNet);
+
+  if(!data.length){ body.innerHTML='<tr><td colspan="6" class="empty">No suppliers match this view.</td></tr>'; return; }
+
+  const cellAmt = v => v>0.005 ? '<span class="num">'+eur(v)+'</span>' : (v<-0.005 ? '<span class="neg num">'+eur(v)+'</span>' : '<span class="zero">—</span>');
+  data.forEach(d=>{
+    const tr=document.createElement('tr');
+    if(ui.selected===d.supplier) tr.className='sel';
+    const oldPill = (d.oldest>0 && d.overdueNet>0.005)
+      ? '<span class="pill '+(d.oldest>90?'danger':'warn')+'">'+d.oldest+' d</span>'
+      : (d.overdueNet<=0.005 && d.apply>0.005 ? '<span class="pill ok">paid</span>' : '<span class="pill ok">current</span>');
+    const overCell = cellAmt(d.overdueNet);
+    const outCell  = cellAmt(d.currentNet);
+    const netCell  = d.net>0.005 ? '<span class="net num">'+eur(d.net)+'</span>' : (d.net<-0.005 ? '<span class="neg num">'+eur(d.net)+'</span>' : '<span class="zero">—</span>');
+    const cls = supClass(d.supplier);
+    let tierHtml='';
+    if(ui.mode==='editor'){
+      tierHtml = '<span class="classbtns" data-sup="'+encodeURIComponent(d.supplier)+'">'+
+        '<button data-set="key" class="'+(cls==='key'?'act':'')+'">Key</button>'+
+        '<button data-set="nonkey" class="'+(cls==='nonkey'?'act':'')+'">Non-key</button></span>';
+    }
+    const alertIco = supplierAlertBadge(d.supplier);
+    const noteIco = noteBadge(d.supplier);
     tr.innerHTML =
-      '<td><div class="supname"><span class="ch">▸</span>'+s.name+flag+note+credit+'</div></td>'+
-      '<td class="num">'+s.inv+'</td>'+
-      '<td>'+amtCell(s.nyd)+'</td>'+
-      '<td>'+amtCell(s.ov)+'</td>'+
+      '<td><div class="supname"><span class="ch">▸</span>'+d.supplier+alertIco+noteIco+' '+tierHtml+(d.inCredit?' <span class="pill ok">in credit '+eur(-d.net)+'</span>':'')+'</div></td>'+
+      '<td class="num">'+d.invoices+'</td>'+
+      '<td>'+outCell+'</td>'+
+      '<td>'+overCell+'</td>'+
       '<td>'+netCell+'</td>'+
-      '<td>'+oldPill+'</td>';
+      '<td class="oldcol">'+oldPill+'</td>';
+    tr.onclick=(ev)=>{
+      const b=ev.target.closest('.classbtns button');
+      if(b){ ev.stopPropagation(); setClass(d.supplier, b.dataset.set); return; }
+      ui.selected = ui.selected===d.supplier?null:d.supplier; renderAll();
+    };
     body.appendChild(tr);
-    if(open){
-      const dr=document.createElement('tr'); dr.className='detrow';
-      dr.innerHTML='<td colspan="6">'+detailHTML(s,idx)+'</td>';
+
+    if(ui.selected===d.supplier){
+      const dr=document.createElement('tr'); dr.className='detailrow';
+      const invs=viewRows().filter(r=>r.supplier===d.supplier)
+        .sort((a,b)=>(a.invoiceDate||'').localeCompare(b.invoiceDate||''));
+      let rowsHtml='';
+      invs.forEach(r=>{
+        const status = r.overdue!==0
+          ? '<span class="pill '+(r.daysOverdue>90?'danger':'warn')+'">'+r.daysOverdue+' d overdue</span>'
+          : '<span class="pill ok">not due</span>';
+        const amtCls = r.total<0?'neg num':'num';
+        rowsHtml+='<tr><td>'+(r.ref||'<span class="zero">no ref</span>')+'</td>'+
+          '<td>'+fmtDate(r.invoiceDate)+'</td>'+
+          '<td>'+fmtDate(r.dueDate)+'</td>'+
+          '<td>'+status+'</td>'+
+          '<td class="'+amtCls+'">'+eur(r.total)+'</td></tr>';
+      });
+      const supAlerts=alerts.filter(x=>x.supplier===d.supplier);
+      const alertsHtml=supAlerts.map(a=>'<div class="detail-alert"><span class="alertdot">!</span><span class="atxt">'+esc(a.text||'')+'</span>'+(a.amount?'<span class="ameta"> · '+eur(+a.amount)+'</span>':'')+(a.date?'<span class="ameta"> · '+fmtDate(a.date)+'</span>':'')+'</div>').join('');
+      const noteTxt = notes[d.supplier];
+      const noteHtml = noteTxt ? '<div class="detail-note"><span class="ni">✎</span><span>'+esc(noteTxt)+'</span></div>' : '';
+      dr.innerHTML='<td colspan="6"><div class="detailwrap">'+
+        noteHtml+
+        '<table class="dettbl">'+
+        '<thead><tr><th>Invoice ref</th><th>Invoice date</th><th>Due date</th><th>Status</th><th class="amt">Amount</th></tr></thead>'+
+        '<tbody>'+rowsHtml+'</tbody></table>'+
+        alertsHtml+
+        (d.apply>0?'<div class="alloc-note">'+eur(d.apply)+' paid, not yet allocated — applied to oldest first. Net payable <b class="'+(d.net<0?'neg':'net')+' num">'+eur(d.net)+'</b>'+(d.inCredit?' · in credit '+eur(-d.net):'')+'</div>':'')+
+        '</div></td>';
       body.appendChild(dr);
     }
   });
 }
 
-/* ---------------- guided tour ---------------- */
-const STEPS=[
-  {title:"Welcome", body:"A quick tour of your view-only dashboard. Use Next and Back to move through it. Afterwards you can explore freely — nothing here ever changes the data."},
-  {el:".kpis", title:"The three numbers", body:"Your headline. Not yet due (bills not due yet) plus Overdue (past their due date) equals Net payable — what we actually owe now, after payments already made. It ties to the ledger."},
-  {el:"#remStack", title:"Reminders", body:"Important notes from finance sit in red at the very top. They stack like phone alerts — tap to open them all.", before:()=>{ document.getElementById('remStack').classList.add('open'); }},
-  {el:".toolbar", title:"Search & filter", body:"Find a supplier by name, or use the toggles to narrow the view — only Key suppliers, or only what's Overdue. Every total updates to match."},
-  {el:"#supHead", title:"The supplier list", body:"Every supplier, split across the columns. Tap any heading to sort. A red ! marks a reminder, ✎ means there's a note, and a red figure tagged “in credit” means we've overpaid."},
-  {el:"#detail-0", title:"Open a supplier", body:"Tap a row to open its invoices, due dates and status — plus any note, reminder, and the “paid, not yet allocated” line showing the Net payable.", before:()=>{ ui.open=0; render(); }},
-  {title:"You're set", body:"That's the whole dashboard. Explore freely — tap rows, sort columns, filter and search. Replay this tour anytime from the button in the corner."},
-];
-let ti=0, touring=false;
-const $ = s=>document.querySelector(s);
+/* ============ payments to apply ============ */
+function renderApply(){
+  const sel=document.getElementById('apSup');
+  const sups=[...new Set(DATA.rows.map(r=>r.supplier))].sort();
+  sel.innerHTML='<option value="">Select supplier…</option>'+sups.map(s=>'<option>'+s+'</option>').join('');
+  const list=document.getElementById('applyList');
+  if(!unapplied.length){ list.innerHTML='<div class="empty">No unallocated payments yet. Add one above when you’ve paid a supplier but haven’t matched it to an invoice.</div>'; return; }
+  list.innerHTML='';
+  unapplied.slice().reverse().forEach(u=>{
+    const it=document.createElement('div'); it.className='applyitem';
+    it.innerHTML='<span class="a-sup">'+u.supplier+'</span>'+
+      '<span class="a-note">'+(u.note||'')+'</span>'+
+      '<span class="a-date">'+(u.date?fmtDate(u.date):'')+'</span>'+
+      '<span class="a-amt num">'+eur(+u.amount)+'</span>'+
+      '<button class="del" title="Remove">×</button>';
+    it.querySelector('.del').onclick=()=>{ unapplied=unapplied.filter(x=>x.id!==u.id); persistUnapplied(); renderAll(); toast('Payment removed'); };
+    list.appendChild(it);
+  });
+  const tot=unapplied.reduce((a,u)=>a+(+u.amount||0),0);
+  const ft=document.createElement('div'); ft.className='applytotal';
+  ft.innerHTML='<span class="a-sup">Total to apply</span><span class="a-amt num">'+eur(tot)+'</span><span class="a-cnt">'+unapplied.length+' payment'+(unapplied.length===1?'':'s')+'</span>';
+  list.appendChild(ft);
+}
 
-function startTour(){ touring=true; ti=0; document.getElementById('replay').style.display='none'; document.getElementById('backdrop').style.display='block'; document.getElementById('card').style.display='block'; showStep(); }
-function tour(d){ const n=ti+d; if(n<0)return; if(n>=STEPS.length){ endTour(); return;} ti=n; showStep(); }
-function endTour(){ touring=false; ['backdrop','hi','card'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('backdrop').classList.remove('dim'); document.getElementById('replay').style.display='inline-flex'; }
-
-function showStep(){
-  const s=STEPS[ti];
-  if(s.before) s.before();
-  // dots + text
-  document.getElementById('cStep').textContent = (ti===0||ti===STEPS.length-1)?'Guided tour':('Step '+ti+' of '+(STEPS.length-2));
-  document.getElementById('cTitle').textContent=s.title;
-  document.getElementById('cBody').textContent=s.body;
-  document.getElementById('cBack').style.visibility = ti===0?'hidden':'visible';
-  document.getElementById('cNext').textContent = ti===STEPS.length-1?'Done':'Next';
-  document.getElementById('cDots').innerHTML = STEPS.map((_,i)=>'<i class="'+(i===ti?'on':'')+'"></i>').join('');
-  const hi=document.getElementById('hi'), bd=document.getElementById('backdrop');
-  const t = s.el ? document.querySelector(s.el) : null;
-  if(t){
-    bd.classList.remove('dim');
-    t.scrollIntoView({block:'center'});
-    requestAnimationFrame(()=>place(t));
+function renderAlerts(){
+  const strip=document.getElementById('alertStrip');
+  strip.innerHTML='';
+  const items=alerts.slice().reverse();
+  if(!items.length) return;
+  const chip=(a,withDel)=>{
+    const amt=a.amount?'<span class="when">'+eur(+a.amount)+(a.date?' · '+fmtDate(a.date):'')+'</span>':(a.date?'<span class="when">'+fmtDate(a.date)+'</span>':'');
+    return '<div class="alertchip" data-id="'+a.id+'"><span class="ic">!</span>'+
+      '<span><span class="who">'+esc(a.supplier)+'</span>'+(a.text?' — <span class="txt">'+esc(a.text)+'</span>':'')+'</span>'+
+      amt+(ui.mode==='editor'?'<button class="del" title="Remove">×</button>':'')+'</div>';
+  };
+  const wrap=document.createElement('div');
+  wrap.className='nstack'+(ui.alertsOpen?' open':'')+(items.length>1?' multi':'');
+  if(items.length>1){
+    wrap.innerHTML='<button class="nstack-head" type="button">'+
+        '<span class="ic">!</span>'+
+        '<span class="nstack-sum"><b>'+items.length+' reminders</b> · latest: '+esc(items[0].supplier)+(items[0].text?' — '+esc(items[0].text):'')+'</span>'+
+        '<span class="chev">'+(ui.alertsOpen?'▴':'▾')+'</span></button>'+
+      '<div class="nstack-list">'+items.map(a=>chip(a,true)).join('')+'</div>';
+    wrap.querySelector('.nstack-head').onclick=()=>{ ui.alertsOpen=!ui.alertsOpen; renderAlerts(); };
   } else {
-    bd.classList.add('dim'); hi.style.display='none'; centerCard();
+    wrap.innerHTML='<div class="nstack-list one">'+chip(items[0],true)+'</div>';
+  }
+  wrap.querySelectorAll('.alertchip .del').forEach(btn=>{
+    btn.onclick=(e)=>{ e.stopPropagation(); const id=btn.closest('.alertchip').dataset.id; alerts=alerts.filter(x=>x.id!=id); persistAlerts(); renderAll(); toast('Reminder removed'); };
+  });
+  strip.appendChild(wrap);
+}
+
+function renderAlertEditor(){
+  const sel=document.getElementById('alSup');
+  const sups=[...new Set(DATA.rows.map(r=>r.supplier))].sort();
+  sel.innerHTML='<option value="">Select supplier…</option>'+sups.map(s=>'<option>'+s+'</option>').join('');
+  const list=document.getElementById('alertEditList');
+  if(!alerts.length){ list.innerHTML='<div class="empty">No reminders yet. Type anything against a supplier — it shows in bold red at the top for your viewers.</div>'; return; }
+  list.innerHTML='';
+  alerts.slice().reverse().forEach(a=>{
+    const it=document.createElement('div'); it.className='applyitem';
+    it.innerHTML='<span class="a-sup">'+esc(a.supplier)+'</span>'+
+      '<span class="a-note" style="color:var(--danger);font-weight:700">'+esc(a.text||'')+'</span>'+
+      '<span class="a-date">'+(a.date?fmtDate(a.date):'')+'</span>'+
+      '<span class="a-amt num">'+(a.amount?eur(+a.amount):'')+'</span>'+
+      '<button class="del" title="Remove">×</button>';
+    it.querySelector('.del').onclick=()=>{ alerts=alerts.filter(x=>x.id!==a.id); persistAlerts(); renderAll(); toast('Reminder removed'); };
+    list.appendChild(it);
+  });
+}
+function renderAll(){
+  document.getElementById('clearBtn').style.display = ui.selected?'inline-flex':'none';
+  document.querySelectorAll('#supTable thead th').forEach(th=>{
+    const a=th.querySelector('.arr'); if(!a) return;
+    a.textContent = th.dataset.k===ui.sort.key ? (ui.sort.dir<0?'▾':'▴') : '';
+  });
+  renderKPIs(); renderCashDue(); renderTop5(); renderTable(); renderApply(); renderAlertEditor(); renderNoteEditor(); renderAlerts(); renderNotice();
+  document.querySelectorAll('#tierSeg button').forEach(b=>b.classList.toggle('on', b.dataset.t===ui.tier));
+  document.getElementById('asat').textContent = fmtDate(DATA.asAt);
+  const upd = DATA.updatedAt ? new Date(DATA.updatedAt) : null;
+  document.getElementById('updated').textContent = upd
+    ? upd.toLocaleDateString('en-IE',{day:'2-digit',month:'short',year:'numeric'})
+    : 'not uploaded yet';
+}
+
+function renderNotice(){
+  const n=document.getElementById('classNotice');
+  const sups=[...new Set(DATA.rows.map(r=>r.supplier))];
+  const un=sups.filter(s=>supClass(s)==='unclassified');
+  if(ui.mode!=='editor' || !un.length){ n.style.display='none'; return; }
+  n.style.display='flex';
+  n.innerHTML='<span>'+un.length+' new supplier'+(un.length>1?'s':'')+' need'+(un.length>1?'':'s')+' a Key / Non-key tag — they’re excluded from the Key and Non-key views until set.</span>'+
+    '<button id="showUn">Show them</button>';
+  n.querySelector('#showUn').onclick=()=>{ ui.tier='unclassified'; renderAll(); };
+}
+
+/* ============ events ============ */
+document.getElementById('searchInput').addEventListener('input',e=>{ ui.search=e.target.value; renderTable(); });
+document.getElementById('viewSeg').addEventListener('click',e=>{  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#viewSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  ui.view=b.dataset.v; renderAll();
+});
+document.getElementById('tierSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  ui.tier=b.dataset.t; ui.selected=null; renderAll();
+});
+document.getElementById('attnBtn').addEventListener('click',()=>{ ui.attention=!ui.attention; renderTable(); });
+document.getElementById('cashDue').addEventListener('click',e=>{
+  const c=e.target.closest('.cd'); if(!c) return;
+  const i=+c.dataset.cb; ui.cashOpen = (ui.cashOpen===i)?null:i; renderCashDue();
+});
+document.getElementById('cashTierSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#cashTierSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  ui.cashTier=b.dataset.ct; ui.cashOpen=null; renderCashDue();
+});
+document.querySelectorAll('#supTable thead th').forEach(th=>{
+  if(!th.dataset.k) return;
+  th.onclick=()=>{ if(ui.sort.key===th.dataset.k) ui.sort.dir*=-1; else { ui.sort.key=th.dataset.k; ui.sort.dir = th.dataset.k==='supplier'?1:-1; } renderTable();
+    document.querySelectorAll('#supTable thead th .arr').forEach(a=>a.textContent=''); renderAll(); };
+});
+document.getElementById('clearBtn').onclick=()=>{ ui.selected=null; renderAll(); };
+
+document.getElementById('apAdd').onclick=()=>{
+  const sup=document.getElementById('apSup').value;
+  const amt=parseFloat(document.getElementById('apAmt').value);
+  const date=document.getElementById('apDate').value;
+  const note=document.getElementById('apNote').value.trim();
+  if(!sup){ toast('Choose a supplier'); return; }
+  if(!amt||amt<=0){ toast('Enter an amount'); return; }
+  unapplied.push({id:Date.now()+''+Math.random().toString(36).slice(2,6),supplier:sup,amount:amt,date:date||null,note:note});
+  persistUnapplied();
+  document.getElementById('apAmt').value=''; document.getElementById('apNote').value='';
+  renderAll(); toast('Payment added — netted off '+sup);
+};
+document.getElementById('resetAll').onclick=(e)=>{ e.preventDefault(); if(confirm('Remove all recorded payments-to-apply?')){ unapplied=[]; persistUnapplied(); renderAll(); toast('Payments cleared'); } };
+document.getElementById('setPw').onclick=(e)=>{
+  e.preventDefault();
+  const cur=getPublishPw();
+  const pw=window.prompt('Set the password your two viewers will use to open the hosted dashboard.\n\nUse a strong password and share it with them separately from the link.', cur);
+  if(pw===null) return;
+  if(pw.length<6){ toast('Password must be at least 6 characters'); return; }
+  try{ localStorage.setItem('bd_pub_pw',pw); }catch(e){}
+  toast('Viewer password set — Publish update to apply it');
+};
+
+/* reminders (free text, shown bold red) */
+document.getElementById('alAdd').onclick=()=>{
+  const sup=document.getElementById('alSup').value;
+  const amt=parseFloat(document.getElementById('alAmt').value);
+  const date=document.getElementById('alDate').value;
+  const text=document.getElementById('alText').value.trim();
+  if(!sup){ toast('Choose a supplier'); return; }
+  if(!text && !amt){ toast('Add a message or amount'); return; }
+  alerts.push({id:Date.now()+''+Math.random().toString(36).slice(2,6),supplier:sup,amount:isNaN(amt)?null:amt,date:date||null,text:text});
+  persistAlerts();
+  document.getElementById('alAmt').value=''; document.getElementById('alText').value=''; document.getElementById('alDate').value='';
+  ui.alertsOpen=true; renderAll(); toast('Reminder added');
+};
+
+/* per-supplier notes (quiet context; hover + in detail) */
+function renderNoteEditor(){
+  const sel=document.getElementById('ntSup');
+  if(!sel) return;
+  const sups=[...new Set(DATA.rows.map(r=>r.supplier))].sort();
+  sel.innerHTML='<option value="">Select supplier…</option>'+sups.map(s=>'<option>'+esc(s)+'</option>').join('');
+  const list=document.getElementById('noteEditList');
+  const keys=Object.keys(notes).filter(k=>notes[k]);
+  if(!keys.length){ list.innerHTML='<div class="empty">No notes yet. Add quiet context for a supplier — it shows on hover and inside the supplier’s detail.</div>'; return; }
+  list.innerHTML='';
+  keys.forEach(sup=>{
+    const it=document.createElement('div'); it.className='applyitem';
+    it.innerHTML='<span class="a-sup">'+esc(sup)+'</span><span class="a-note">'+esc(notes[sup])+'</span><button class="del" title="Remove">×</button>';
+    it.querySelector('.del').onclick=()=>{ delete notes[sup]; persistNotes(); renderAll(); toast('Note removed'); };
+    list.appendChild(it);
+  });
+}
+document.getElementById('ntAdd').onclick=()=>{
+  const sup=document.getElementById('ntSup').value;
+  const text=document.getElementById('ntText').value.trim();
+  if(!sup){ toast('Choose a supplier'); return; }
+  if(!text){ toast('Type a note'); return; }
+  notes[sup]=text; persistNotes();
+  document.getElementById('ntText').value='';
+  renderAll(); toast('Note saved for '+sup);
+};
+
+/* mode switch */
+function setMode(m){
+  ui.mode=m;
+  document.getElementById('mEditor').classList.toggle('on',m==='editor');
+  document.getElementById('mViewer').classList.toggle('on',m==='viewer');
+  document.body.classList.toggle('viewer-mode', m==='viewer');
+  document.querySelectorAll('.editor-only').forEach(el=>el.classList.toggle('viewer-hidden', m==='viewer'));
+  const onAp=document.getElementById('page-ap').classList.contains('on');
+  document.getElementById('refreshBtn').style.display=(m==='editor'&&onAp)?'':'none';
+  renderAll();
+}
+document.getElementById('mEditor').onclick=()=>setMode('editor');
+document.getElementById('mViewer').onclick=()=>setMode('viewer');
+
+/* set / change the password viewers type to open the dashboard */
+document.getElementById('pwBtn').onclick=function(){
+  const cur=getPublishPw();
+  const msg = cur
+    ? 'Change the password your viewers type to open the dashboard.\n\nEnter a new strong password (4 random words or 12+ characters). After changing it, click "Export to share" again and re-host the new file, then tell your viewers the new password.'
+    : 'Set the password your viewers will type to open the dashboard.\n\nUse a strong one (4 random words or 12+ characters) and share it with them separately from the link.';
+  const pw=window.prompt(msg, cur||'');
+  if(pw===null) return;
+  if(pw.length<8){ toast('Use at least 8 characters'); return; }
+  try{ localStorage.setItem('bd_pub_pw',pw); }catch(e){}
+  toast(cur && pw!==cur ? 'Password changed — click Export to share to apply it' : 'Password set — now click Export to share');
+};
+
+/* export ONE self-contained, password-locked file — encrypted data lives INSIDE it */
+document.getElementById('shareBtn').onclick=async function(){
+  const pw=ensurePublishPw();
+  if(!pw){ return; }
+  const payload={v:1, publishedAt:new Date().toISOString(), data:DATA, unapplied:unapplied, alerts:alerts, classOverrides:classOverrides, classmap:CLASSMAP, notes:notes};
+  const enc=await encryptPayload(payload, pw);
+  const clone=document.documentElement.cloneNode(true);
+  // embed the ENCRYPTED data, then wipe every plaintext block so the file holds nothing readable
+  clone.querySelector('#apenc').textContent=JSON.stringify(enc);
+  clone.querySelector('#apdata').textContent='{"asAt":null,"rows":[]}';
+  clone.querySelector('#apunapplied').textContent='[]';
+  clone.querySelector('#apclassoverrides').textContent='{}';
+  clone.querySelector('#apalerts').textContent='[]';
+  clone.querySelector('#apnotes').textContent='{}';
+  clone.querySelector('#apclass').textContent='{}';
+  const b=clone.querySelector('body');
+  b.setAttribute('data-viewer','1');
+  b.setAttribute('data-enc','1');
+  b.removeAttribute('data-state');
+  const sb=clone.querySelector('#supBody'); if(sb) sb.innerHTML='';
+  const al=clone.querySelector('#applyList'); if(al) al.innerHTML='';
+  const lg=clone.querySelector('#lockErr'); if(lg) lg.textContent='';
+  const html='<!doctype html>\n'+clone.outerHTML;
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='index.html'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  toast('Saved index.html — host or send this one file; viewers open it with the password');
+};
+
+/* viewer unlock — nothing is shown until the right password decrypts the data */
+function applyState(s){
+  if(s.data) DATA=s.data;
+  if(s.unapplied) unapplied=s.unapplied;
+  if(s.alerts) alerts=s.alerts;
+  if(s.classOverrides) classOverrides=s.classOverrides;
+  if(s.classmap) CLASSMAP=s.classmap;
+  if(s.notes) notes=s.notes;
+}
+async function unlockViewer(pw){
+  const errEl=document.getElementById('lockErr');
+  const btn=document.getElementById('lockBtn');
+  if(!pw){ errEl.textContent='Enter the password.'; return; }
+  errEl.textContent=''; btn.disabled=true; btn.textContent='Unlocking…';
+  try{
+    let blob=null;
+    try{ blob=JSON.parse(document.getElementById('apenc').textContent); }catch(e){ blob=null; }
+    if(!blob){ throw new Error('nodata'); }
+    const s=await decryptPayload(blob, pw);   // throws on wrong password (authenticated)
+    applyState(s);
+    document.getElementById('lock').style.display='none';
+    renderAll(); switchPage('ap');
+  }catch(err){
+    btn.disabled=false; btn.textContent='Unlock';
+    errEl.textContent = (err && err.message==='nodata')
+      ? 'This file has no data in it yet.'
+      : 'Incorrect password.';
   }
 }
-function place(t){
-  const hi=document.getElementById('hi'), card=document.getElementById('card');
-  const r=t.getBoundingClientRect(); const p=8;
-  hi.style.display='block';
-  hi.style.left=(r.left-p)+'px'; hi.style.top=(r.top-p)+'px';
-  hi.style.width=(r.width+p*2)+'px'; hi.style.height=(r.height+p*2)+'px';
-  const cw=card.offsetWidth, chh=card.offsetHeight, m=14, vw=innerWidth, vh=innerHeight;
-  let top = r.bottom+m+chh < vh ? r.bottom+m : (r.top-m-chh>0 ? r.top-m-chh : Math.max(m,(vh-chh)/2));
-  let left = Math.min(Math.max(m, r.left + r.width/2 - cw/2), vw-cw-m);
-  card.style.left=left+'px'; card.style.top=top+'px';
+
+async function hydrateFromState(){
+  if(!VIEWER_ONLY) return;
+  if(document.body.dataset.enc==='1'){
+    const lock=document.getElementById('lock'); lock.style.display='flex';
+    const pwEl=document.getElementById('lockPw'), btn=document.getElementById('lockBtn');
+    const go=()=>unlockViewer(pwEl.value);
+    btn.onclick=go;
+    pwEl.addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+    setTimeout(()=>pwEl.focus(),60);
+  }
 }
-function centerCard(){
-  const card=document.getElementById('card');
-  card.style.left=Math.max(14,(innerWidth-card.offsetWidth)/2)+'px';
-  card.style.top=Math.max(14,(innerHeight-card.offsetHeight)/2)+'px';
+
+/* refresh data from a fresh export */
+document.getElementById('refreshBtn').onclick=()=>document.getElementById('fileInput').click();
+
+document.getElementById('csvBtn').onclick=function(){
+  const q = v => { const s=(v==null?'':String(v)); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+  const n = v => (Math.round((+v||0)*100)/100).toFixed(2);
+  const row = arr => arr.map(q).join(',');
+  const page = ui.page||'ap';
+  let L=[], fname;
+
+  if(page==='ap'){
+    const rows=DATA.rows||[], ups=unapplied||[];
+    const names=[...new Set([...rows.map(r=>r.supplier), ...ups.map(u=>u.supplier)])]
+      .sort((a,b)=>a.toLowerCase().localeCompare(b.toLowerCase()));
+    L.push(row(['BabyDoc Shop — Accounts Payable aging']));
+    L.push(row(['As at', DATA.asAt||'']));
+    L.push('');
+    L.push(row(['Supplier','Invoice date','Due date','Reference','Days overdue','Not yet due','Overdue','Total']));
+    let TCUR=0,TOV=0,TTOT=0,TAPP=0;
+    names.forEach(name=>{
+      // invoices for this supplier, oldest first by invoice date
+      rows.filter(r=>r.supplier===name)
+          .sort((a,b)=>(a.invoiceDate||'').localeCompare(b.invoiceDate||''))
+          .forEach(r=>{
+            TCUR+=r.current||0; TOV+=r.overdue||0; TTOT+=r.total||0;
+            L.push(row([name, r.invoiceDate||'', r.dueDate||'', r.ref||'', (r.overdue!==0?r.daysOverdue:0),
+                        n(r.current), n(r.overdue), n(r.total)]));
+          });
+      // this supplier's payments yet to apply, listed right below its invoices (negative = reduces what's owed)
+      ups.filter(u=>u.supplier===name)
+         .sort((a,b)=>(a.date||'').localeCompare(b.date||''))
+         .forEach(u=>{
+            TAPP += +u.amount||0;
+            L.push(row([name, u.date||'', '', 'Payment yet to apply'+(u.note?(' — '+u.note):''), '', '', '', n(-(+u.amount||0))]));
+         });
+      L.push(''); // blank line between suppliers
+    });
+    L.push(row(['Total due (overdue + not yet due)','','','','', n(TCUR), n(TOV), n(TTOT)]));
+    L.push(row(['Total payments yet to apply','','','','','','', n(-TAPP)]));
+    L.push(row(['Net payable','','','','','','', n(TTOT-TAPP)]));
+    fname='BabyDoc-AP-aging-'+(DATA.asAt||'export')+'.csv';
+  } else {
+    // Balance Sheet / Income Statement are placeholders for now.
+    // When those pages are built, replace this stub with their own row-builders — the button already
+    // follows whichever tab is open, so it will export the right report automatically.
+    const name = page==='bs' ? 'Balance Sheet' : 'Income Statement';
+    L.push(row(['BabyDoc Shop — '+name]));
+    L.push(row(['As at', DATA.asAt||'']));
+    L.push('');
+    L.push(row(['This report is not available yet.']));
+    L.push(row(['The '+name+' page is a placeholder. Once it is built, this download will export the '+name+'.']));
+    fname='BabyDoc-'+name.replace(/ /g,'-')+'.csv';
+  }
+
+  const csv='\ufeff'+L.join('\r\n');                       // BOM so Excel reads € and accents
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=fname;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  toast(page==='ap' ? 'CSV downloaded' : (page==='bs'?'Balance Sheet':'Income Statement')+' isn’t available yet');
+};
+document.getElementById('fileInput').onchange=async function(e){
+  const f=e.target.files[0]; if(!f) return;
+  try{
+    let parsed;
+    if(f.name.toLowerCase().endsWith('.csv')){
+      parsed=parseAP_csv(await f.text());
+    } else {
+      const M=await readXlsxMatrix(await f.arrayBuffer());
+      parsed=rowsFromMatrix(M);
+    }
+    if(!parsed.rows.length){ toast('No rows found — check the file'); return; }
+    DATA=parsed; DATA.updatedAt=Date.now(); persistData();
+    ui.selected=null; renderAll(); toast('Data updated · '+parsed.rows.length+' invoices');
+  }catch(err){ console.error(err); toast('Could not read that file — is it the Aged Payables export?'); }
+  e.target.value='';
+};
+
+/* parse a Xero Aged Payables Detail export */
+function rowsFromMatrix(M){
+  // find header row containing 'Contact'
+  let h=-1, asAt=DATA.asAt;
+  for(let i=0;i<M.length;i++){
+    const c=(M[i][0]||'').toString();
+    if(/as at/i.test(c)){ const m=c.match(/as at\s+(.+)/i); if(m){ const d=new Date(m[1]); if(!isNaN(d)) asAt=d.toISOString().slice(0,10);} }
+    if(c.trim()==='Contact'){ h=i; break; }
+  }
+  if(h<0) throw new Error('header not found');
+  const head=M[h].map(x=>(x||'').toString().trim());
+  const idx=n=>head.indexOf(n);
+  const iC=idx('Contact'),iIn=idx('Invoice Date'),iDue=idx('Due Date'),iRef=idx('Invoice Reference'),iCur=idx('Current'),iTot=idx('Total');
+  const overFrom=iCur+1, overTo=iTot; // bands between Current and Total
+  const asAtD=new Date(asAt+'T00:00:00');
+  const rows=[];
+  for(let i=h+1;i<M.length;i++){
+    const c=(M[i][iC]||'').toString().trim();
+    if(!c||/^total$/i.test(c)||/percentage/i.test(c)) continue;
+    const due=excelDate(M[i][iDue]); const inv=excelDate(M[i][iIn]);
+    const total=+M[i][iTot]||0;
+    let over=0; for(let j=overFrom;j<overTo;j++) over+=(+M[i][j]||0);
+    const dnum = due? Math.round((asAtD-due)/86400000):0;
+    rows.push({supplier:c,invoiceDate:inv?iso(inv):null,dueDate:due?iso(due):null,ref:(M[i][iRef]||'').toString(),
+      current:+M[i][iCur]||0,overdue:Math.round(over*100)/100,total:Math.round(total*100)/100,daysOverdue:dnum>0?dnum:0});
+  }
+  return {asAt,rows};
 }
-addEventListener('resize',()=>{ if(touring) showStep(); });
-addEventListener('keydown',e=>{ if(!touring)return; if(e.key==='ArrowRight'||e.key==='Enter')tour(1); if(e.key==='ArrowLeft')tour(-1); if(e.key==='Escape')endTour(); });
+/* ---- built-in Excel reader (no external libraries) ---- */
+async function inflateRaw(bytes){
+  const ds=new DecompressionStream('deflate-raw');
+  const stream=new Blob([bytes]).stream().pipeThrough(ds);
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+function decodeXmlEntities(s){
+  return s.replace(/&#x([0-9a-fA-F]+);/g,(_,h)=>String.fromCodePoint(parseInt(h,16)))
+          .replace(/&#(\d+);/g,(_,d)=>String.fromCodePoint(parseInt(d,10)))
+          .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"')
+          .replace(/&apos;/g,"'").replace(/&amp;/g,'&');
+}
+async function unzip(buf){
+  const dv=new DataView(buf.buffer||buf), bytes=new Uint8Array(buf.buffer||buf);
+  let eocd=-1;
+  for(let i=bytes.length-22;i>=0;i--){ if(dv.getUint32(i,true)===0x06054b50){ eocd=i; break; } }
+  if(eocd<0) throw new Error('not a zip');
+  const cdCount=dv.getUint16(eocd+10,true); let p=dv.getUint32(eocd+16,true);
+  const files={};
+  for(let n=0;n<cdCount;n++){
+    if(dv.getUint32(p,true)!==0x02014b50) break;
+    const method=dv.getUint16(p+10,true), compSize=dv.getUint32(p+20,true);
+    const nameLen=dv.getUint16(p+28,true), extraLen=dv.getUint16(p+30,true), commentLen=dv.getUint16(p+32,true);
+    const localOff=dv.getUint32(p+42,true);
+    const name=new TextDecoder().decode(bytes.subarray(p+46,p+46+nameLen));
+    const lNameLen=dv.getUint16(localOff+26,true), lExtraLen=dv.getUint16(localOff+28,true);
+    const dataStart=localOff+30+lNameLen+lExtraLen;
+    const comp=bytes.subarray(dataStart,dataStart+compSize);
+    files[name]=method===0?comp.slice():await inflateRaw(comp);
+    p+=46+nameLen+extraLen+commentLen;
+  }
+  return files;
+}
+function colToNum(ref){ const m=ref.match(/^([A-Z]+)/); if(!m) return 0; let c=0; for(let i=0;i<m[1].length;i++) c=c*26+(m[1].charCodeAt(i)-64); return c-1; }
+function parseSharedStrings(xml){
+  if(!xml) return []; const out=[]; const reSi=/<si\b[^>]*>([\s\S]*?)<\/si>/g; let m;
+  while((m=reSi.exec(xml))){ let text=''; const reT=/<t\b[^>]*>([\s\S]*?)<\/t>/g; let t; while((t=reT.exec(m[1]))) text+=t[1]; out.push(decodeXmlEntities(text)); }
+  return out;
+}
+function parseSheet(xml,shared){
+  const rows=[]; const reRow=/<row\b[^>]*>([\s\S]*?)<\/row>/g; let rm;
+  while((rm=reRow.exec(xml))){
+    const cells=[]; const reC=/<c\b([^>]*)>([\s\S]*?)<\/c>|<c\b([^>]*)\/>/g; let cm;
+    while((cm=reC.exec(rm[1]))){
+      const attrs=cm[1]||cm[3]||'', body=cm[2]||'';
+      const refM=attrs.match(/r="([A-Z]+\d+)"/); const ci=refM?colToNum(refM[1]):cells.length;
+      const tM=attrs.match(/t="([^"]+)"/); const type=tM?tM[1]:'n'; let val=null;
+      if(type==='inlineStr'){ let text=''; const reT=/<t\b[^>]*>([\s\S]*?)<\/t>/g; let t; while((t=reT.exec(body))) text+=t[1]; val=decodeXmlEntities(text); }
+      else { const vM=body.match(/<v>([\s\S]*?)<\/v>/); if(vM){ if(type==='s') val=shared[parseInt(vM[1],10)]??''; else if(type==='str') val=decodeXmlEntities(vM[1]); else if(type==='b') val=vM[1]==='1'; else { const num=Number(vM[1]); val=isNaN(num)?vM[1]:num; } } }
+      cells[ci]=val;
+    }
+    rows.push(cells);
+  }
+  return rows;
+}
+async function readXlsxMatrix(arrayBuffer){
+  const u8=arrayBuffer instanceof Uint8Array?arrayBuffer:new Uint8Array(arrayBuffer);
+  const files=await unzip(u8);
+  const shared=parseSharedStrings(files['xl/sharedStrings.xml']?new TextDecoder().decode(files['xl/sharedStrings.xml']):'');
+  const names=Object.keys(files).filter(k=>/^xl\/worksheets\/sheet\d+\.xml$/.test(k)).sort((a,b)=>parseInt(a.match(/(\d+)/)[1])-parseInt(b.match(/(\d+)/)[1]));
+  if(!names.length) throw new Error('no worksheet');
+  return parseSheet(new TextDecoder().decode(files[names[0]]),shared);
+}
+function parseAP_csv(txt){
+  const M=txt.split(/\r?\n/).map(l=>l.split(',').map(c=>c.replace(/^"|"$/g,'')));
+  return rowsFromMatrix(M);
+}
+function excelDate(v){
+  if(v==null||v==='') return null;
+  if(v instanceof Date) return v;
+  if(typeof v==='number') return new Date(Math.round((v-25569)*86400000));
+  const d=new Date(v); return isNaN(d)?null:d;
+}
+function iso(d){ return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+
+/* page navigation */
+function switchPage(p){
+  ui.page=p;
+  document.querySelectorAll('.page').forEach(s=>s.classList.toggle('on', s.id==='page-'+p));
+  document.querySelectorAll('.pagenav button').forEach(b=>b.classList.toggle('on', b.dataset.page===p));
+  // "Update data" is AP-specific; "Export to share" stays available everywhere
+  const apEdit=(p==='ap' && ui.mode==='editor');
+  document.getElementById('refreshBtn').style.display = apEdit ? '' : 'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelector('.pagenav').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-page]'); if(!b) return; switchPage(b.dataset.page);
+});
 
 /* init */
-renderReminders(); render();
-setTimeout(startTour, 450);
+document.getElementById('apDate').value=new Date().toISOString().slice(0,10);
+if(VIEWER_ONLY){
+  setMode('viewer');
+  document.getElementById('modeswitch').style.display='none'; // viewers can't switch to editor
+}
+renderAll();
+switchPage('ap');
+hydrateFromState();
+</script>
+
+<div id="gbBackdrop"></div>
+<div id="gbSpot"></div>
+<div id="gbCard">
+  <button class="gb-skip" onclick="gbEnd()">Skip ✕</button>
+  <div class="gb-step" id="gbStep">Guided tour</div>
+  <h4 id="gbTitle"></h4>
+  <p id="gbBody"></p>
+  <div class="gb-row">
+    <div class="gb-dots" id="gbDots"></div>
+    <button id="gbBack" onclick="gbMove(-1)">Back</button>
+    <button class="go" id="gbNext" onclick="gbMove(1)">Next</button>
+  </div>
+</div>
+<button id="gbReplay" onclick="gbStart()" style="display:none">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.3 5.6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M4 20v-5h5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  Replay tour
+</button>
+<div id="gbBadge"><b>Sample data</b> · interactive guide</div>
+
+<script>
+(function(){
+  var STEPS=[
+    {title:"Welcome to your dashboard",body:"A quick tour of the view-only Accounts Payable dashboard. Use Next and Back to move through it — afterwards, explore freely. Nothing here ever changes the data."},
+    {sel:".kpis",title:"The three headline numbers",body:"Not yet due (bills not due yet) plus Overdue (past their due date) equals Net payable — what we actually owe now, after payments already made. It ties to the ledger."},
+    {sel:"#kpiNotes",title:"How it reconciles",body:"Total due − payment allocation in progress = Net payable, so the headline always ties out. “Payment allocation in progress” is money already paid that Xero hasn’t matched to invoices yet."},
+    {sel:".cashdue-wrap",title:"Cash needed — by due date",body:"Five boxes show how much cash is needed and when; together they add up to Net payable. Tap any box to list the suppliers behind it. The All / Key / Non-key buttons filter this panel.",before:function(){try{ui.cashOpen=0;renderCashDue();}catch(e){}}},
+    {sel:"#alertStrip",title:"Reminders",body:"Important notes from finance show in red at the very top — for example chasing or a stop-supply warning. They stack like phone alerts; tap to open them all."},
+    {sel:".controls",title:"Search & filter",body:"Find a supplier by name, narrow by Key / Non-key or by status (Overdue / Not yet due), or tap Review to see only suppliers that have a note or a reminder."},
+    {sel:"#supPanel",title:"The supplier list",body:"Every supplier, split across the columns — tap a heading to sort. A red ! means a reminder, ✎ means a note, a red “in credit” figure means we’ve overpaid, and “paid” means a payment has cleared that supplier’s overdue."},
+    {sel:"#supPanel",title:"Open a supplier",body:"Tap any row to expand its invoices, due dates and status, plus the line showing money paid-not-yet-allocated and the resulting Net payable. Here a payment clears the overdue first, then the rest reduces what’s not yet due.",before:function(){try{ui.selected='Willow & Pine Furniture';renderAll();}catch(e){}}},
+    {sel:".ap-side",title:"Top 5 key payables",body:"Down the right-hand side, the five Key suppliers we owe the most by net payable, each showing Overdue and Not yet due."},
+    {title:"You're all set",body:"That’s the whole dashboard. Explore freely — tap rows, sort columns, filter, search and open the cash boxes. Replay this tour anytime from the button in the corner."}
+  ];
+  var i=0, on=false;
+  function $(id){return document.getElementById(id);}
+  function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+  window.gbStart=function(){on=true;i=0;$('gbReplay').style.display='none';$('gbBackdrop').style.display='block';$('gbCard').style.display='block';show();};
+  window.gbMove=function(d){var n=i+d;if(n<0)return;if(n>=STEPS.length){gbEnd();return;}i=n;show();};
+  window.gbEnd=function(){on=false;['gbBackdrop','gbSpot','gbCard'].forEach(function(id){$(id).style.display='none';});$('gbReplay').style.display='inline-flex';try{ui.selected=null;ui.cashOpen=null;renderAll();}catch(e){}window.scrollTo({top:0});};
+  function dots(){var h='';for(var k=1;k<STEPS.length-1;k++){h+='<span class="gb-dot'+((k===i)?' on':'')+'"></span>';}$('gbDots').innerHTML=h;}
+  function show(){
+    var s=STEPS[i];
+    if(s.before)s.before();
+    $('gbStep').textContent=(i===0||i===STEPS.length-1)?'Guided tour':('Step '+i+' of '+(STEPS.length-2));
+    $('gbTitle').textContent=s.title;$('gbBody').textContent=s.body;
+    $('gbBack').style.visibility=(i===0)?'hidden':'visible';
+    $('gbNext').textContent=(i===STEPS.length-1)?'Done':'Next';
+    dots();
+    var spot=$('gbSpot'),card=$('gbCard'),el=s.sel?document.querySelector(s.sel):null;
+    if(el){ el.scrollIntoView({block:'center'}); }
+    setTimeout(function(){
+      var cw=card.offsetWidth, ch=card.offsetHeight, vw=innerWidth, vh=innerHeight;
+      if(el){
+        var r=el.getBoundingClientRect(), pad=8;
+        spot.style.display='block';
+        spot.style.left=(r.left-pad)+'px';spot.style.top=(r.top-pad)+'px';
+        spot.style.width=(r.width+pad*2)+'px';spot.style.height=(r.height+pad*2)+'px';
+        var below=r.bottom+14, top=(below+ch<vh-10)?below:clamp(r.top-ch-14,10,vh-ch-10);
+        var left=clamp(r.left,10,vw-cw-10);
+        card.style.left=left+'px';card.style.top=top+'px';
+      } else {
+        spot.style.display='none';
+        card.style.left=((vw-cw)/2)+'px';card.style.top=((vh-ch)/2)+'px';
+      }
+    },60);
+  }
+  addEventListener('resize',function(){if(on)show();});
+  addEventListener('keydown',function(e){if(!on)return;if(e.key==='ArrowRight'||e.key==='Enter')gbMove(1);if(e.key==='ArrowLeft')gbMove(-1);if(e.key==='Escape')gbEnd();});
+  setTimeout(gbStart, 500);
+})();
 </script>
 </body>
 </html>
